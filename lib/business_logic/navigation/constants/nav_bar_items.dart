@@ -1,0 +1,1 @@
+enum NavbarItem { activities, timers, settings }
