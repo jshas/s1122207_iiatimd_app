@@ -29,8 +29,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 direction: Axis.vertical,
                 children: [
                   ListTile(
+                    titleAlignment: ListTileTitleAlignment.threeLine,
                     title: Text("Theme",
-                        style: Theme.of(context).textTheme.bodyLarge),
+                        style: Theme.of(context).textTheme.bodyMedium),
                     trailing: SegmentedButton(segments: const [
                       ButtonSegment<ThemeItem>(
                           value: ThemeItem.light,
@@ -41,7 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           value: ThemeItem.dark,
                           enabled: true,
                           icon: Icon(Icons.dark_mode),
-                          label: Text("dark")),
+                          label: Text("Night")),
                       ButtonSegment<ThemeItem>(
                           value: ThemeItem.system,
                           enabled: true,
@@ -57,42 +58,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   )
                 ],
               ),
-              Flex(
-                direction: Axis.horizontal,
-                children: [
-                  Flexible(
-                    flex: 1,
-                    fit: FlexFit.tight,
-                    child: ListTile(
-                      visualDensity: VisualDensity.adaptivePlatformDensity,
-                      title: Text("Reminder timer duration", style: Theme.of(context).textTheme.bodyLarge),
-                      trailing: SegmentedButton(segments: const [
-                        ButtonSegment<ThemeItem>(
-                            value: ThemeItem.light,
-                            enabled: true,
-                            icon: Icon(Icons.light_mode),
-                            label: Text("Light")),
-                        ButtonSegment<ThemeItem>(
-                            value: ThemeItem.dark,
-                            enabled: true,
-                            icon: Icon(Icons.dark_mode),
-                            label: Text("dark")),
-                        ButtonSegment<ThemeItem>(
-                            value: ThemeItem.system,
-                            enabled: true,
-                            icon: Icon(Icons.android),
-                            label: Text("Follow OS")),
-                      ], selected: <ThemeItem>{selection},
-                        onSelectionChanged: (Set<ThemeItem>selectedThemeItem) {
-                          context.read<ThemeCubit>().setTheme(
-                              selectedThemeItem.first);
-                          selection = selectedThemeItem.first;
-                        },
-                      ),
-                    ),
-                  )
-                ],
-              )
+              // Flex(
+              //   direction: Axis.horizontal,
+              //   children: [
+              //     Flexible(
+              //       flex: 1,
+              //       fit: FlexFit.tight,
+              //       child: ListTile(
+              //         visualDensity: VisualDensity.adaptivePlatformDensity,
+              //         title: Text("Reminder timer duration", style: Theme.of(context).textTheme.bodyLarge),
+              //         trailing: SegmentedButton(segments: const [
+              //           ButtonSegment<ThemeItem>(
+              //               value: ThemeItem.light,
+              //               enabled: true,
+              //               icon: Icon(Icons.light_mode),
+              //               label: Text("Light")),
+              //           ButtonSegment<ThemeItem>(
+              //               value: ThemeItem.dark,
+              //               enabled: true,
+              //               icon: Icon(Icons.dark_mode),
+              //               label: Text("dark")),
+              //           ButtonSegment<ThemeItem>(
+              //               value: ThemeItem.system,
+              //               enabled: true,
+              //               icon: Icon(Icons.android),
+              //               label: Text("Follow OS")),
+              //         ], selected: <ThemeItem>{selection},
+              //           onSelectionChanged: (Set<ThemeItem>selectedThemeItem) {
+              //             context.read<ThemeCubit>().setTheme(
+              //                 selectedThemeItem.first);
+              //             selection = selectedThemeItem.first;
+              //           },
+              //         ),
+              //       ),
+              //     )
+              //   ],
+              // )
             ],
 
           ),
