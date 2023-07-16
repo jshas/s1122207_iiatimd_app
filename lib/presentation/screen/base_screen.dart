@@ -58,9 +58,15 @@ class BaseScreen extends StatelessWidget {
           body: BlocBuilder<NavigationCubit, NavigationState>(
                 builder: (context, state) {
                   if (state.navbarItem == NavbarItem.activities) {
-                    return const ActivitiesScreen(title: "Activities");
+                    return  const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: ActivitiesScreen(title: "Activities"),
+                    );
                   } else if (state.navbarItem == NavbarItem.timers) {
-                    return const TimersScreen(title: "Timers");
+                    return const Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: const TimersScreen(title: "Timers"),
+                    );
                   } else if (state.navbarItem == NavbarItem.settings) {
                     return const SettingsScreen(title: "Settings");
                   }

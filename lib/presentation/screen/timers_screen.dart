@@ -14,26 +14,31 @@ class _TimersScreenState extends State<TimersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var timerAxis = Axis.vertical;
+    if (MediaQuery.orientationOf(context) == Orientation.portrait) {timerAxis = Axis.vertical;}
+    if (MediaQuery.orientationOf(context) == Orientation.landscape) {timerAxis = Axis.horizontal;}
     return Container(
       constraints: BoxConstraints(
-        minHeight: 40.0,
+        minHeight: 50.0,
         minWidth: 20.0,
         maxWidth: MediaQuery.sizeOf(context).width - MediaQuery.of(context).viewPadding.horizontal,
         maxHeight: MediaQuery.sizeOf(context).height - MediaQuery.of(context).viewPadding.vertical,
       ),
-      child: const Flexible(
-
+      child: Flexible(
         fit: FlexFit.tight,
         child: Flex(
-
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              direction: Axis.horizontal,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Placeholder(fallbackHeight: 100, fallbackWidth: 200,),
-                Placeholder(fallbackHeight: 100, fallbackWidth: 200,),
-                Placeholder(fallbackHeight: 100, fallbackWidth: 200,),
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          direction: timerAxis,
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Spacer(),
+            Placeholder(fallbackHeight: 150, fallbackWidth: 200,),
+            Spacer(),
+            Placeholder(fallbackHeight: 150, fallbackWidth: 200,),
+            Spacer(),
+            Placeholder(fallbackHeight: 150, fallbackWidth: 200,),
+                Spacer(),
               ],
             ),
         ),
