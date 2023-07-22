@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smallstep/business_logic/timer/timer_bloc.dart';
 import 'package:smallstep/presentation/screen/base_screen.dart';
 import 'business_logic/theme/theme_cubit.dart';
 import 'data/repositories/theme_repository.dart';
@@ -31,9 +32,14 @@ class App extends StatelessWidget {
           BlocProvider<NavigationCubit>(
             create: (context) => NavigationCubit(),
           ),
+          BlocProvider<TimerBloc>(
+            create: (context) => TimerBloc(),
+          ),
           BlocProvider<ThemeCubit>(
-            create: (context) => ThemeCubit(themeRepository: context.read<ThemeRepository>(),
-    )..getCurrentTheme())],
+              create: (context) => ThemeCubit(
+                    themeRepository: context.read<ThemeRepository>(),
+                  )..getCurrentTheme())
+        ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, state) {
             return MaterialApp(

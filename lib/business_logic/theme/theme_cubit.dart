@@ -11,8 +11,7 @@ part 'theme_state.dart';
 class ThemeCubit extends Cubit<ThemeState> {
   ThemeCubit({
     required ThemePersistence themeRepository,
-  })
-      : _themeRepository = themeRepository,
+  })  : _themeRepository = themeRepository,
         super(const ThemeState(ThemeItem.light, ThemeMode.light));
 
   final ThemePersistence _themeRepository;
@@ -21,7 +20,7 @@ class ThemeCubit extends Cubit<ThemeState> {
   void getCurrentTheme() {
     // Since `getTheme()` returns a stream, we listen to the output
     _themeSubscription = _themeRepository.getTheme().listen(
-          (themeName) {
+      (themeName) {
         getThemeItem(themeName);
       },
     );
