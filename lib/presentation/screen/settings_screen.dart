@@ -26,6 +26,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     setState(() {
       _timerSelection = context.read<TimerBloc>().getTimerItem();
+      _themeSelection = context.read<ThemeCubit>().state.theme;
     });
     // initTheme();
     // initTimer();
@@ -77,20 +78,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: SegmentedButton(
+                      style: Theme.of(context).segmentedButtonTheme.style,
                       segments: const [
                         ButtonSegment<TimerItem>(
                             value: TimerItem.short,
-                            label: Text("15 min"),
+                            label: Text("15 minutes"),
                             icon: Icon(Icons.access_time),
                             enabled: true),
                         ButtonSegment<TimerItem>(
                             value: TimerItem.medium,
-                            label: Text("30 min"),
+                            label: Text("30 minutes"),
                             icon: Icon(Icons.access_time),
                             enabled: true),
                         ButtonSegment<TimerItem>(
                             value: TimerItem.long,
-                            label: Text("45 min"),
+                            label: Text("45 minutes"),
                             icon: Icon(Icons.access_time),
                             enabled: true),
                       ],
@@ -99,6 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onSelectionChanged: (Set<TimerItem> selectedTimerItem) {
                         context.read<TimerBloc>().
                             add(TimerSet(timerItem: selectedTimerItem.first));
+                        // context.read<TimerBloc>().add(const TimerReset());
                         setState(() {
                           _timerSelection = selectedTimerItem.first;
                         });
@@ -148,12 +151,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           value: ThemeItem.light,
                           enabled: true,
                           icon: Icon(Icons.light_mode),
-                          label: Text("Light")),
+                          label: Text("Light Mode")),
                       ButtonSegment<ThemeItem>(
                           value: ThemeItem.dark,
                           enabled: true,
                           icon: Icon(Icons.dark_mode),
-                          label: Text("Night")),
+                          label: Text("Dark Mode")),
                       ButtonSegment<ThemeItem>(
                           value: ThemeItem.system,
                           enabled: true,
@@ -161,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           label: Text("Follow OS")),
                     ],
                     selected: <ThemeItem>{_themeSelection},
-                    showSelectedIcon: false,
+                    showSelectedIcon: true,
                     onSelectionChanged: (Set<ThemeItem> selectedThemeItem) {
                       context
                           .read<ThemeCubit>()

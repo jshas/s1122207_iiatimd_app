@@ -17,6 +17,7 @@ class ThemeCubit extends Cubit<ThemeState> {
   final ThemePersistence _themeRepository;
   late StreamSubscription<ThemeItem> _themeSubscription; // This should be addressed for subsequent attempts to read out current data after init.
 
+
   void getCurrentTheme() {
     // Since `getTheme()` returns a stream, we listen to the output
     _themeSubscription = _themeRepository.getTheme().listen(

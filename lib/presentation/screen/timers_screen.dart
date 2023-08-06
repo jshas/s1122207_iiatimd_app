@@ -12,7 +12,7 @@ class TimersScreen extends StatefulWidget {
 }
 
 class _TimersScreenState extends State<TimersScreen> {
-  int _remainingActiveTime = 30;
+  final int _remainingActiveTime = 30;
   int _duration = 0;
   Axis _timerAxis = Axis.vertical;
 
@@ -58,21 +58,25 @@ class _TimersScreenState extends State<TimersScreen> {
                         .cardColor,
                     shadowColor: Theme.of(context).shadowColor,
                     elevation: 0,
-                    child: Text(_remainingActiveTime.toString(),
-                        style: Theme
-                    .of(context)
-                    .textTheme
-                    .bodyLarge)),
+                    child: Center(
+                      child: Text(_remainingActiveTime.toString(),
+                          style: Theme
+                      .of(context)
+                      .textTheme
+                      .bodyLarge),
+                    )),
               )),
           Expanded(
               flex: 1,
               child: Flex(
                 direction: _timerAxis,
-                children:[ Text(_duration.toString(),
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .bodyLarge),],
+                children:[ Center(
+                  child: Text(_duration.toString(),
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyLarge),
+                ),],
               )),
           Expanded(
               flex: 1,

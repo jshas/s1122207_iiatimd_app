@@ -62,9 +62,9 @@ class App extends StatelessWidget {
               themeMode: state.themeMode,
               //
               theme:
-                  ThemeData(colorScheme: lightColorScheme, useMaterial3: true),
+                  ThemeData(colorScheme: lightColorScheme, useMaterial3: true, visualDensity: VisualDensity.adaptivePlatformDensity),
               darkTheme:
-                  ThemeData(colorScheme: darkColorScheme, useMaterial3: true),
+                  ThemeData(colorScheme: darkColorScheme, useMaterial3: true, visualDensity: VisualDensity.adaptivePlatformDensity),
               home: const BaseScreen(),
             );
           },
