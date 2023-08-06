@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:smallstep/data/data_providers/ticker.dart';
@@ -12,19 +11,20 @@ part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
   /// counting down from 60
-  late final Ticker _ticker;
-  late final TimerRepository _timerRepository;
-  static int _duration = 45 * 60;
+  final Ticker _ticker;
+  final TimerRepository _timerRepository;
+  static int _duration = 30* 60;
   TimerItem _timerItem = TimerItem.short;
 
   /// to listen to the ticker stream
-  late StreamSubscription<int> _tickerSubscription;
+  StreamSubscription<int>? _tickerSubscription;
 
   // To retrieve the duration set in SharedPreferences
-  late StreamSubscription<TimerItem> _timerSubscription;
+  StreamSubscription<TimerItem>? _timerSubscription;
 
   TimerBloc({required Ticker ticker, required TimerRepository timerRepository})
-      : _ticker = ticker, _timerRepository = timerRepository,
+      : _ticker = ticker,
+        _timerRepository = timerRepository,
         super(TimerInitial(_duration)) {
     on<TimerStarted>(_onStarted);
     on<TimerTicked>(_onTicked);
@@ -48,7 +48,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     );
   }
 
-  TimerItem getTimerItem(){
+  TimerItem getTimerItem() {
     String? value = _timerRepository.getValue();
     switch (value) {
       case 'short':
@@ -101,17 +101,18 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
 
   @override
   Future<void> close() {
-    _tickerSubscription.cancel();
+    _tickerSubscription?.cancel();
+    _timerSubscription?.cancel();
     _timerRepository.dispose();
     return super.close();
   }
 
   void _onStarted(TimerStarted event, Emitter<TimerState> emit) {
     /// In case of there is an subscription exists, we have to cancel it
-    _tickerSubscription.cancel();
+    _tickerSubscription?.cancel();
 
     /// triggers the TimerRunInProgress state
-    getCurrentTimerItem();
+    // getCurrentTimerItem();
     emit(TimerRunInProgress(event.duration));
 
     /// makes the subscription listen to TimerTicked state
@@ -132,14 +133,15 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
 
   void _onPaused(TimerPaused event, Emitter<TimerState> emit) {
     /// As the timer pause, we should pause the subscription also
-    _tickerSubscription.pause();
+    _tickerSubscription?.pause();
     emit(TimerRunPause(state.duration));
+
     /// triggers the TimerRunPause state
   }
 
   void _onResumed(TimerResumed event, Emitter<TimerState> emit) {
     /// As the timer resume, we must let the subscription resume also
-    _tickerSubscription.resume();
+    _tickerSubscription?.resume();
     emit(TimerRunInProgress(state.duration));
 
     /// triggers the TimerRunInProgress state
@@ -147,9 +149,9 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
 
   void _onReset(TimerReset event, Emitter<TimerState> emit) {
     /// Timer counting finished, so we must cancel the subscription
-    _tickerSubscription.cancel();
+    _tickerSubscription?.cancel();
+    _timerSubscription?.cancel();
     emit(TimerInitial(_duration));
-
     /// triggers the TimerInitial state
   }
 
@@ -157,6 +159,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     /// Get the current timerItem from the event TimerSet event.
     saveDuration(event.timerItem);
     updateDuration(event.timerItem);
+
     /// emit the TimerInitial state
     emit(TimerInitial(_duration));
   }

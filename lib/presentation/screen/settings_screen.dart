@@ -80,6 +80,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: SegmentedButton(
                       style: Theme.of(context).segmentedButtonTheme.style,
                       segments: const [
+                        /*
+                           TODO:
+                            1. [Disable buttons if TimerState != TimerInitial]
+                            2. Add tooltip/info section to explain why these buttons are disabled while a timer is active.
+                         */
                         ButtonSegment<TimerItem>(
                             value: TimerItem.short,
                             label: Text("15 minutes"),
@@ -101,7 +106,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onSelectionChanged: (Set<TimerItem> selectedTimerItem) {
                         context.read<TimerBloc>().
                             add(TimerSet(timerItem: selectedTimerItem.first));
-                        // context.read<TimerBloc>().add(const TimerReset());
                         setState(() {
                           _timerSelection = selectedTimerItem.first;
                         });
