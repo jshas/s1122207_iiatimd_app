@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smallstep/business_logic/theme/constants/theme_items.dart';
@@ -16,8 +18,22 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  ThemeItem themeSelection = ThemeItem.dark;
-  TimerItem timerSelection = TimerItem.short;
+  ThemeItem _themeSelection = ThemeItem.dark;
+  TimerItem _timerSelection = TimerItem.short;
+
+  @override
+  void initState(){
+    // initTheme();
+    // initTimer();
+  }
+
+  Future<void> initTheme() async {
+
+  }
+
+  Future<void> initTimer() async {
+    // _timerSelection = context.read<TimerRepository>().getTimerDuration().first;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,73 +46,129 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           BlocBuilder<TimerBloc, TimerState>(
             builder: (context, state) {
-             return Flex(
+              return Flex(
                 direction:
-                MediaQuery
-                    .of(context)
-                    .orientation == Orientation.portrait
-                    ? Axis.vertical
-                    : Axis.horizontal,
+                    MediaQuery.of(context).orientation == Orientation.portrait
+                        ? Axis.vertical
+                        : Axis.horizontal,
                 children: [
-                  const Align(alignment: AlignmentDirectional.centerStart ,child: Text("Reminder Timer")),
-                  SegmentedButton(segments: const [
-                    ButtonSegment(value: 10, label: Text("10 Seconds")),
-                  ], selected: <TimerItem>{
-                    timerSelection
-                  }),
+                  Container(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    width: MediaQuery.of(context).orientation ==
+                            Orientation.portrait
+                        ? 400
+                        : 200,
+                    height: 60,
+                    padding: const EdgeInsets.all(16.0),
+                    child: Align(
+                      heightFactor: 0,
+                      widthFactor: 0,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        'Reminder Duration',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SegmentedButton(
+                      segments: const [
+                        ButtonSegment<TimerItem>(
+                            value: TimerItem.short,
+                            label: Text("15 min"),
+                            icon: Icon(Icons.access_time),
+                            enabled: true),
+                        ButtonSegment<TimerItem>(
+                            value: TimerItem.medium,
+                            label: Text("30 min"),
+                            icon: Icon(Icons.access_time),
+                            enabled: true),
+                        ButtonSegment<TimerItem>(
+                            value: TimerItem.long,
+                            label: Text("45 min"),
+                            icon: Icon(Icons.access_time),
+                            enabled: true),
+                      ],
+                      selected: <TimerItem>{_timerSelection},
+                      emptySelectionAllowed: false,
+                      onSelectionChanged: (Set<TimerItem> selectedTimerItem) {
+                        context
+                            .read<TimerBloc>()
+                            .saveDuration(selectedTimerItem.first);
+                        _timerSelection = selectedTimerItem.first;
+                      },
+                    ),
+                  ),
                 ],
               );
             },
           ),
+          SizedBox(
+              height: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? 10.0
+                  : 0),
           BlocBuilder<ThemeCubit, ThemeState>(
-            builder: (context, state) =>
-            // Theme Selection
-            Flex(
+            builder: (context, state) => Flex(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
               direction:
-              MediaQuery
-                  .of(context)
-                  .orientation == Orientation.portrait
-                  ? Axis.vertical
-                  : Axis.horizontal,
+                  MediaQuery.of(context).orientation == Orientation.portrait
+                      ? Axis.vertical
+                      : Axis.horizontal,
               children: [
-                SizedBox(
-                  child: Text("Theme",
-                      textAlign: TextAlign.start,
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .labelSmall),
+                Container(
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  width:
+                      MediaQuery.of(context).orientation == Orientation.portrait
+                          ? 400
+                          : 200,
+                  height: 60,
+                  padding: const EdgeInsets.all(8),
+                  child: Align(
+                    heightFactor: 0,
+                    widthFactor: 0,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      "Theme",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
                 ),
-                SegmentedButton(
-                  segments: const [
-                    ButtonSegment<ThemeItem>(
-                        value: ThemeItem.light,
-                        enabled: true,
-                        icon: Icon(Icons.light_mode),
-                        label: Text("Light")),
-                    ButtonSegment<ThemeItem>(
-                        value: ThemeItem.dark,
-                        enabled: true,
-                        icon: Icon(Icons.dark_mode),
-                        label: Text("Night")),
-                    ButtonSegment<ThemeItem>(
-                        value: ThemeItem.system,
-                        enabled: true,
-                        icon: Icon(Icons.android),
-                        label: Text("Follow OS")),
-                  ],
-                  selected: <ThemeItem>{themeSelection},
-                  showSelectedIcon: false,
-                  onSelectionChanged: (Set<ThemeItem> selectedThemeItem) {
-                    context
-                        .read<ThemeCubit>()
-                        .setTheme(selectedThemeItem.first);
-                    themeSelection = selectedThemeItem.first;
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SegmentedButton(
+                    segments: const [
+                      ButtonSegment<ThemeItem>(
+                          value: ThemeItem.light,
+                          enabled: true,
+                          icon: Icon(Icons.light_mode),
+                          label: Text("Light")),
+                      ButtonSegment<ThemeItem>(
+                          value: ThemeItem.dark,
+                          enabled: true,
+                          icon: Icon(Icons.dark_mode),
+                          label: Text("Night")),
+                      ButtonSegment<ThemeItem>(
+                          value: ThemeItem.system,
+                          enabled: true,
+                          icon: Icon(Icons.android),
+                          label: Text("Follow OS")),
+                    ],
+                    selected: <ThemeItem>{_themeSelection},
+                    showSelectedIcon: false,
+                    onSelectionChanged: (Set<ThemeItem> selectedThemeItem) {
+                      context
+                          .read<ThemeCubit>()
+                          .setTheme(selectedThemeItem.first);
+                      _themeSelection = selectedThemeItem.first;
+                    },
+                  ),
                 ),
               ],
             ),
           ),
+          Spacer(),
         ],
       ),
     );

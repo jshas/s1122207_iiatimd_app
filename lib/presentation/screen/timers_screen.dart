@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TimersScreen extends StatefulWidget {
   const TimersScreen({super.key, required this.title});
@@ -11,7 +12,22 @@ class TimersScreen extends StatefulWidget {
 
 class _TimersScreenState extends State<TimersScreen> {
   int currentPageIndex = 0;
-  var timerAxis = Axis.vertical;
+  int activeTime = 30;
+  Axis timerAxis = Axis.vertical;
+  String _timerItem = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDuration();
+  }
+
+  Future<void> _loadDuration() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _timerItem = (prefs.getString('__timer_persistence_key__') ?? 'N/A');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,34 +39,72 @@ class _TimersScreenState extends State<TimersScreen> {
     }
     return Container(
       constraints: BoxConstraints(
-        minHeight: 50.0,
-        minWidth: 20.0,
+        minHeight: 200.0 ,
+        minWidth: 200.0,
         maxWidth: MediaQuery
             .sizeOf(context)
-            .width - MediaQuery
-            .of(context)
-            .viewPadding
-            .horizontal,
+            .width,
+            // -
+            // MediaQuery
+            //     .of(context)
+            //     .viewPadding
+            //     .horizontal,
         maxHeight: MediaQuery
             .sizeOf(context)
-            .height - MediaQuery
-            .of(context)
-            .viewPadding
-            .vertical,),
+            .height
+          // -
+          //   MediaQuery
+          //       .of(context)
+          //       .viewPadding
+          //       .vertical,
+      ),
       child: Flex(
+        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         direction: timerAxis,
-        children: const [
-          Spacer(),
-          Placeholder(fallbackHeight: 150, fallbackWidth: 200,),
-          Spacer(),
-          Placeholder(fallbackHeight: 150, fallbackWidth: 200,),
-          Spacer(),
-          Placeholder(fallbackHeight: 150, fallbackWidth: 200,),
-          Spacer(),
-        ],
+        children: [
+          Expanded(
+              flex: 1,
+              child: Center(
+                child: Card(
+                    color: Theme
+                        .of(context)
+                        .cardColor,
+                    shadowColor: Theme.of(context).shadowColor,
+                    elevation: 0,
+                    child: Text(activeTime.toString(),
+                        style: Theme
+                    .of(context)
+                    .textTheme
+                    .bodyLarge)),
+              )),
+          Expanded(
+              flex: 1,
+              child: Center(
+                child: Text(_timerItem,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .bodyLarge),
+              )),
+          Expanded(
+              flex: 1,
+              child: Center(child: reminderTimer(context, activeTime)),
+      ),],
       ),
     );
   }
 }
+
+var reminderTimer = (context, activeTime) =>
+(Container(
+    height: 20,
+    width: 20,
+    color: Theme.of(context).cardColor,
+    child: Text(activeTime.toString(),
+        style: Theme
+            .of(context)
+            .textTheme
+            .bodyLarge)
+));

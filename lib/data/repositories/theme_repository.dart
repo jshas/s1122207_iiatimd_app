@@ -11,7 +11,9 @@ abstract class ThemePersistence {
 class ThemeRepository implements ThemePersistence {
   ThemeRepository({
     required SharedPreferences sharedPreferences,
-  }) : _sharedPreferences = sharedPreferences;
+  }) : _sharedPreferences = sharedPreferences {
+    _init();
+  }
 
   final SharedPreferences _sharedPreferences;
 
@@ -19,8 +21,31 @@ class ThemeRepository implements ThemePersistence {
 
   final _controller = StreamController<ThemeItem>();
 
+  String? _getValue(String key) {
+    try {
+      return _sharedPreferences.getString(key);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _setValue(String key, String value) =>
       _sharedPreferences.setString(key, value);
+
+  void _init() {
+    final themeString = _getValue(_kThemePersistenceKey);
+    if(themeString != null) {
+      if (themeString == ThemeItem.light.name){
+        _controller.add(ThemeItem.light);
+      } else if (themeString == ThemeItem.dark.name) {
+        _controller.add(ThemeItem.dark);
+      } else {
+        _controller.add(ThemeItem.system);
+      }
+    } else {
+      _controller.add(ThemeItem.system);
+    }
+  }
 
   @override
   Stream<ThemeItem> getTheme() => _controller.stream;
@@ -33,4 +58,6 @@ class ThemeRepository implements ThemePersistence {
 
   @override
   void dispose() => _controller.close();
+
+
 }

@@ -12,10 +12,10 @@ class ThemeCubit extends Cubit<ThemeState> {
   ThemeCubit({
     required ThemePersistence themeRepository,
   })  : _themeRepository = themeRepository,
-        super(const ThemeState(ThemeItem.light, ThemeMode.light));
+        super(const ThemeState(ThemeItem.dark, ThemeMode.dark));
 
   final ThemePersistence _themeRepository;
-  late StreamSubscription<ThemeItem> _themeSubscription;
+  late StreamSubscription<ThemeItem> _themeSubscription; // This should be addressed for subsequent attempts to read out current data after init.
 
   void getCurrentTheme() {
     // Since `getTheme()` returns a stream, we listen to the output
