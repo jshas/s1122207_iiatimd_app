@@ -63,10 +63,7 @@ class BaseScreen extends StatelessWidget {
                       child: ActivitiesScreen(title: "Activities"),
                     );
                   } else if (state.navbarItem == NavbarItem.timers) {
-                    return const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: TimersScreen(title: "Timers"),
-                    );
+                    return const TimersScreen(title: "Timers");
                   } else if (state.navbarItem == NavbarItem.settings) {
                     return const SettingsScreen(title: "Settings");
                   }

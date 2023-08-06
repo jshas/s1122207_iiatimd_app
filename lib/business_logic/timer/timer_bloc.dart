@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:smallstep/data/data_providers/ticker.dart';
 import 'package:smallstep/data/repositories/timer_repository.dart';
 
@@ -15,8 +14,8 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   /// counting down from 60
   late final Ticker _ticker;
   late final TimerRepository _timerRepository;
-  static int _duration = 45;
-  TimerItem timerItem = TimerItem.short;
+  static int _duration = 45 * 60;
+  TimerItem _timerItem = TimerItem.short;
 
   /// to listen to the ticker stream
   late StreamSubscription<int> _tickerSubscription;
@@ -33,17 +32,20 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     on<TimerResumed>(_onResumed);
     on<TimerReset>(_onReset);
     on<TimerSet>(_onSet);
+  }
 
+  void init() {
+    _timerItem = getTimerItem();
+    updateDuration(_timerItem);
   }
 
   void getCurrentTimerItem() {
     _timerSubscription = _timerRepository.getTimerDuration().listen(
       (timerName) {
         // This function returns a TimerItem from the SharedPreferences local storage
-        getCurrentDuration(timerName);
+        updateDuration(timerName);
       },
     );
-    print({'debugTimer' : _timerSubscription});
   }
 
   TimerItem getTimerItem(){
@@ -61,20 +63,17 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   }
 
   // For retrieving the current timer duration from SharedPref
-  void getCurrentDuration(TimerItem timerItem) {
+  void updateDuration(TimerItem timerItem) {
     int minute = 60;
     switch (timerItem) {
       case TimerItem.short:
         _duration = 15 * minute;
-        debugPrint(_duration as String?);
         break;
       case TimerItem.medium:
         _duration = 30 * minute;
-        debugPrint(_duration as String?);
         break;
       case TimerItem.long:
         _duration = 45 * minute;
-        debugPrint(_duration as String?);
         break;
       default:
         _duration = 20 * minute;
@@ -135,7 +134,6 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     /// As the timer pause, we should pause the subscription also
     _tickerSubscription.pause();
     emit(TimerRunPause(state.duration));
-
     /// triggers the TimerRunPause state
   }
 
@@ -157,10 +155,8 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
 
   void _onSet(TimerSet event, Emitter<TimerState> emit) {
     /// Get the current timerItem from the event TimerSet event.
-    print(event.timerItem);
     saveDuration(event.timerItem);
-    getCurrentDuration(event.timerItem);
-    print(_duration);
+    updateDuration(event.timerItem);
     /// emit the TimerInitial state
     emit(TimerInitial(_duration));
   }

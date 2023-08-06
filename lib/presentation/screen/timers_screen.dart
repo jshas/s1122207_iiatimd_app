@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../business_logic/timer/timer_bloc.dart';
+
 
 class TimersScreen extends StatefulWidget {
   const TimersScreen({super.key, required this.title});
-
   final String title;
 
   @override
@@ -11,31 +12,25 @@ class TimersScreen extends StatefulWidget {
 }
 
 class _TimersScreenState extends State<TimersScreen> {
-  int currentPageIndex = 0;
-  int activeTime = 30;
-  Axis timerAxis = Axis.vertical;
-  String _timerItem = '';
+  int _remainingActiveTime = 30;
+  int _duration = 0;
+  Axis _timerAxis = Axis.vertical;
 
   @override
   void initState() {
     super.initState();
-    _loadDuration();
-  }
-
-  Future<void> _loadDuration() async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _timerItem = (prefs.getString('__timer_persistence_key__') ?? 'N/A');
+      _duration = context.read<TimerBloc>().state.duration;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-      timerAxis = Axis.vertical;
+      _timerAxis = Axis.vertical;
     }
     if (MediaQuery.orientationOf(context) == Orientation.landscape) {
-      timerAxis = Axis.horizontal;
+      _timerAxis = Axis.horizontal;
     }
     return Container(
       constraints: BoxConstraints(
@@ -44,25 +39,15 @@ class _TimersScreenState extends State<TimersScreen> {
         maxWidth: MediaQuery
             .sizeOf(context)
             .width,
-            // -
-            // MediaQuery
-            //     .of(context)
-            //     .viewPadding
-            //     .horizontal,
         maxHeight: MediaQuery
             .sizeOf(context)
             .height
-          // -
-          //   MediaQuery
-          //       .of(context)
-          //       .viewPadding
-          //       .vertical,
       ),
       child: Flex(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        direction: timerAxis,
+        direction: _timerAxis,
         children: [
           Expanded(
               flex: 1,
@@ -73,7 +58,7 @@ class _TimersScreenState extends State<TimersScreen> {
                         .cardColor,
                     shadowColor: Theme.of(context).shadowColor,
                     elevation: 0,
-                    child: Text(activeTime.toString(),
+                    child: Text(_remainingActiveTime.toString(),
                         style: Theme
                     .of(context)
                     .textTheme
@@ -81,16 +66,17 @@ class _TimersScreenState extends State<TimersScreen> {
               )),
           Expanded(
               flex: 1,
-              child: Center(
-                child: Text(_timerItem,
+              child: Flex(
+                direction: _timerAxis,
+                children:[ Text(_duration.toString(),
                     style: Theme
                         .of(context)
                         .textTheme
-                        .bodyLarge),
+                        .bodyLarge),],
               )),
           Expanded(
               flex: 1,
-              child: Center(child: reminderTimer(context, activeTime)),
+              child: Center(child: reminderTimer(context, _remainingActiveTime.toString())),
       ),],
       ),
     );
