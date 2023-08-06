@@ -56,7 +56,7 @@ class App extends StatelessWidget {
                   )..getCurrentTheme())
         ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
-          builder: (context, state) {
+          builder: (_, state) {
             return MaterialApp(
               title: 'Flutter Demo',
               themeMode: state.themeMode,

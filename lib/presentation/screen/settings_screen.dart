@@ -23,6 +23,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void initState(){
+    super.initState();
+    setState(() {
+      _themeSelection = context.read<ThemeCubit>().state.theme;
+      _timerSelection = context.read<TimerBloc>().getTimerItem();
+    });
     // initTheme();
     // initTimer();
   }
@@ -96,7 +101,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         context
                             .read<TimerBloc>()
                             .saveDuration(selectedTimerItem.first);
-                        _timerSelection = selectedTimerItem.first;
+                        setState(() {
+                          _timerSelection = selectedTimerItem.first;
+                        });
+                        print({
+                          'timer' : selectedTimerItem.first,
+                        });
                       },
                     ),
                   ),

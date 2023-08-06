@@ -19,6 +19,8 @@ class TimerRepository implements TimerPersistence {
 
   final _controller = StreamController<TimerItem>();
 
+  String? getValue() => _sharedPreferences.getString(_kTimerPersistenceKey);
+
   Future<void> _setValue(String key, String value) =>
       _sharedPreferences.setString(key, value);
 
@@ -33,4 +35,8 @@ class TimerRepository implements TimerPersistence {
 
   @override
   void dispose() => _controller.close();
+
+  void init() {
+
+  }
 }

@@ -33,9 +33,6 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     on<TimerResumed>(_onResumed);
     on<TimerReset>(_onReset);
     on<TimerSet>(_onSet);
-  }
-
-  void init() {
 
   }
 
@@ -44,9 +41,23 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
       (timerName) {
         // This function returns a TimerItem from the SharedPreferences local storage
         getCurrentDuration(timerName);
-
       },
     );
+    print({'debugTimer' : _timerSubscription});
+  }
+
+  TimerItem getTimerItem(){
+    String? value = _timerRepository.getValue();
+    switch (value) {
+      case 'short':
+        return TimerItem.short;
+      case 'medium':
+        return TimerItem.medium;
+      case 'long':
+        return TimerItem.long;
+      default:
+        return TimerItem.short;
+    }
   }
 
   // For retrieving the current timer duration from SharedPref
