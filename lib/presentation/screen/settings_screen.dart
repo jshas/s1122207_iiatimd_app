@@ -22,7 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   TimerItem _timerSelection = TimerItem.short;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     setState(() {
       _timerSelection = context.read<TimerBloc>().getTimerItem();
@@ -32,18 +32,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // initTimer();
   }
 
-  Future<void> initTheme() async {
-
-  }
-
-  Future<void> initTimer() async {
-    // _timerSelection = context.read<TimerRepository>().getTimerDuration().first;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -52,6 +44,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           BlocBuilder<TimerBloc, TimerState>(
             builder: (context, state) {
               return Flex(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 direction:
                     MediaQuery.of(context).orientation == Orientation.portrait
                         ? Axis.vertical
@@ -62,17 +56,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: MediaQuery.of(context).orientation ==
                             Orientation.portrait
                         ? 400
-                        : 200,
-                    height: 60,
+                        : 275,
+                    height: 75,
                     padding: const EdgeInsets.all(16.0),
-                    child: Align(
-                      heightFactor: 0,
-                      widthFactor: 0,
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        'Reminder Duration',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Reminder Duration',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.start,
+                        ),
+                        Spacer(),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.info_outline_rounded, size: 16),
+                            SizedBox(width: 10),
+                            Text(
+                              'Changes applied after resetting timer.',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   ),
                   Padding(
@@ -80,11 +88,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: SegmentedButton(
                       style: Theme.of(context).segmentedButtonTheme.style,
                       segments: const [
-                        /*
-                           TODO:
-                            1. [Disable buttons if TimerState != TimerInitial]
-                            2. Add tooltip/info section to explain why these buttons are disabled while a timer is active.
-                         */
                         ButtonSegment<TimerItem>(
                             value: TimerItem.short,
                             label: Text("15 minutes"),
@@ -104,8 +107,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       selected: <TimerItem>{_timerSelection},
                       emptySelectionAllowed: false,
                       onSelectionChanged: (Set<TimerItem> selectedTimerItem) {
-                        context.read<TimerBloc>().
-                            add(TimerSet(timerItem: selectedTimerItem.first));
+                        context
+                            .read<TimerBloc>()
+                            .add(TimerSet(timerItem: selectedTimerItem.first));
                         setState(() {
                           _timerSelection = selectedTimerItem.first;
                         });
@@ -116,13 +120,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               );
             },
           ),
-          SizedBox(
-              height: MediaQuery.of(context).orientation == Orientation.portrait
-                  ? 10.0
-                  : 0),
+
           BlocBuilder<ThemeCubit, ThemeState>(
             builder: (context, state) => Flex(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               direction:
                   MediaQuery.of(context).orientation == Orientation.portrait
@@ -134,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width:
                       MediaQuery.of(context).orientation == Orientation.portrait
                           ? 400
-                          : 200,
+                          : 275,
                   height: 60,
                   padding: const EdgeInsets.all(8),
                   child: Align(
@@ -143,7 +144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     alignment: AlignmentDirectional.centerStart,
                     child: Text(
                       "Theme",
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
                 ),

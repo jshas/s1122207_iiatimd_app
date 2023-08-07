@@ -13,7 +13,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   /// counting down from 60
   final Ticker _ticker;
   final TimerRepository _timerRepository;
-  static int _duration = 30* 60;
+  static int _duration = 30 * 60;
   TimerItem _timerItem = TimerItem.short;
 
   /// to listen to the ticker stream

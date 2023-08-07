@@ -15,7 +15,7 @@ class BaseScreen extends StatelessWidget {
     return BlocBuilder<NavigationCubit, NavigationState>(
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(title: Text(state.title), centerTitle: true),
+          appBar: AppBar(title: Text(state.title, style: Theme.of(context).textTheme.headlineMedium), centerTitle: true),
           bottomNavigationBar: BlocBuilder<NavigationCubit, NavigationState>(
             builder: (context, state) {
               return NavigationBar(
