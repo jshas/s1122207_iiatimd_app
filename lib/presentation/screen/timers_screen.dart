@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smallstep/business_logic/active_time/active_time_cubit.dart';
+import 'package:smallstep/data/repositories/active_time_repository.dart';
 import '../../business_logic/timer/timer_bloc.dart';
 
 class TimersScreen extends StatefulWidget {
@@ -12,8 +14,7 @@ class TimersScreen extends StatefulWidget {
 }
 
 class _TimersScreenState extends State<TimersScreen> {
-  final int _remainingActiveTime = 30;
-
+  late final int _remainingActiveTime = 30;
   Axis _timerAxis = Axis.vertical;
 
   @override
@@ -31,30 +32,21 @@ class _TimersScreenState extends State<TimersScreen> {
           maxWidth: MediaQuery.sizeOf(context).width,
           maxHeight: MediaQuery.sizeOf(context).height),
       child: Flex(
-          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           direction: _timerAxis,
           children: [
             Expanded(
                 flex: 1,
-                child: Center(
-                  child: Card(
-                      color: Theme.of(context).cardColor,
-                      shadowColor: Theme.of(context).shadowColor,
-                      elevation: 0,
-                      child: Center(
-                        child: Text(_remainingActiveTime.toString(),
-                            style: Theme.of(context).textTheme.bodyLarge),
-                      )),
+                child: BlocProvider.value(
+                  value: BlocProvider.of<ActiveTimeCubit>(context),
+                  child: const ActiveMinutes(),
                 )),
             const Divider(
               indent: 20,
               endIndent: 20,
             ),
-            const Expanded(
-                flex: 1,
-                child: ReminderDuration()),
+            const Expanded(flex: 1, child: ReminderDuration()),
             const Divider(
               indent: 20,
               endIndent: 20,
@@ -64,6 +56,77 @@ class _TimersScreenState extends State<TimersScreen> {
               child: Center(child: Text("Space for active minutes.")),
             ),
           ]),
+    );
+  }
+}
+
+class ActiveMinutes extends StatelessWidget {
+  const ActiveMinutes({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeMinutes =
+        context.select((ActiveTimeCubit bloc) => bloc.state.activeTime);
+    return Center(
+      child: Card(
+          borderOnForeground: true,
+          color: Theme.of(context).cardColor,
+          shadowColor: Theme.of(context).shadowColor,
+          elevation: 0,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Active Minutes",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    alignment: AlignmentDirectional.center,
+                    width: 100.0,
+                    height: 75.0,
+                    color: Theme.of(context).hoverColor,
+                    // decoration: BoxDecoration(color: Theme.of(context).dialogBackgroundColor),
+                    child: BlocBuilder<ActiveTimeCubit, ActiveTimeState>(
+                      builder: (context, state) {
+                        return Text(state.activeTime.toString(),
+                            style: Theme.of(context).textTheme.headlineSmall);
+                      },
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    FloatingActionButton(
+                      child: const Text("-30",
+                      ),
+                      onPressed: () =>
+                          context.read<ActiveTimeCubit>().updateActiveTime(-30),
+                    ),      FloatingActionButton(
+                      child: Text(
+                        '+30', style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      onPressed: () =>
+                          context.read<ActiveTimeCubit>().updateActiveTime(30),
+                    ),     FloatingActionButton(
+                      child: Text(
+                      '+0', style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      onPressed: () =>
+                          context.read<ActiveTimeCubit>().updateActiveTime(0),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          )),
     );
   }
 }
@@ -81,8 +144,7 @@ class ReminderDuration extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Duration',
-            style: Theme.of(context).textTheme.titleMedium),
+        Text('Duration', style: Theme.of(context).textTheme.titleMedium),
         BlocProvider.value(
           value: BlocProvider.of<TimerBloc>(context),
           child: const TimerText(),

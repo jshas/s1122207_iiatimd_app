@@ -8,6 +8,7 @@ abstract class ThemePersistence {
   Future<void> saveTheme(ThemeItem theme);
   void dispose();
 }
+
 class ThemeRepository implements ThemePersistence {
   ThemeRepository({
     required SharedPreferences sharedPreferences,

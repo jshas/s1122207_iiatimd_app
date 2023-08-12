@@ -126,8 +126,8 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         ? TimerRunInProgress(event.duration)
 
         /// triggers the TimerRunInProgress state
+        /// TODO: Use complete state to update UI so user can input new value.
         : const TimerRunComplete());
-
     /// triggers TimerRunComplete state
   }
 
@@ -152,6 +152,7 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     _tickerSubscription?.cancel();
     _timerSubscription?.cancel();
     emit(TimerInitial(_duration));
+
     /// triggers the TimerInitial state
   }
 

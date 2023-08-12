@@ -4,10 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ActiveTimePersistence {
   Stream<int> getActiveTime();
+
   Future<void> saveActiveTime(int time);
+
   Future<void> resetActiveTime();
-  Stream<int> getActiveDate();
-  Future<void> saveActiveDate();
+
   void dispose();
 }
 
@@ -21,37 +22,29 @@ class ActiveTimeRepository implements ActiveTimePersistence {
   final SharedPreferences _sharedPreferences;
 
   static const _kActiveTimePersistenceKey = '__active_time_persistence_key__';
-  static const _kActiveDatePersistenceKey = '__active_date_persistence_key__';
 
   final _controller = StreamController<int>();
-  final _dateController = StreamController<int>();
 
-  int? _getActiveTimeValue(String key) {
-      return _sharedPreferences.getInt(_kActiveTimePersistenceKey);
+  int? _getActiveTimeValue() {
+    return _sharedPreferences.getInt(_kActiveTimePersistenceKey);
   }
 
-  Future<void> _setActiveTimeValue(String key, int value) =>
-      _sharedPreferences.setInt(key,value);
-
-  int? _getActiveDateValue(String key) {
-    return _sharedPreferences.getInt(_kActiveDatePersistenceKey);
-  }
-
-  Future<void> _setActiveDateValue(String key, int value) =>
-      _sharedPreferences.setInt(key,value);
+  Future<void> _setActiveTimeValue(int value) =>
+      _sharedPreferences.setInt(_kActiveTimePersistenceKey, value);
 
   void _init() {
-    final activeTime = _getActiveTimeValue(_kActiveTimePersistenceKey);
-    final activeDate = _getActiveDateValue(_kActiveDatePersistenceKey);
-    final now = DateTime.now().microsecondsSinceEpoch;
+    final activeTime = _getActiveTimeValue();
 
-    if(activeTime != null) {
-        _controller.add(activeTime);
-        (activeDate != null) ? _dateController.add(activeDate) : _dateController.add(now);
-      } else {
-      _controller.add(30);
-      (activeDate != null) ? _dateController.add(activeDate) : _dateController.add(now);
+    if (activeTime != null) {
+      _controller.add(activeTime);
+    } else {
+      _setActiveTimeValue(0);
+      _controller.add(0);
     }
+    // FIXME Remove Print
+    print({
+      'activeTime': _getActiveTimeValue().toString(),
+    });
   }
 
   @override
@@ -59,28 +52,23 @@ class ActiveTimeRepository implements ActiveTimePersistence {
 
   @override
   Future<void> resetActiveTime() {
-    _controller.add(30);
-    return _setActiveTimeValue(_kActiveTimePersistenceKey, 30);
+    _controller.add(0);
+    return _setActiveTimeValue(0);
   }
 
   @override
   Future<void> saveActiveTime(int time) {
     _controller.add(time);
-    return _setActiveTimeValue(_kActiveTimePersistenceKey, time);
-  }
+    print({
+      'storedTime': _getActiveTimeValue().toString(),
+    });
+    print({'timer': time});
 
-  @override
-  Stream<int> getActiveDate() => _dateController.stream.asBroadcastStream();
-
-  @override
-  Future<void> saveActiveDate() {
-    _dateController.add(30);
-    return _setActiveDateValue(_kActiveDatePersistenceKey, 30);
+    return _setActiveTimeValue(time);
   }
 
   @override
   void dispose() {
     _controller.close();
-    _dateController.close();
   }
 }
