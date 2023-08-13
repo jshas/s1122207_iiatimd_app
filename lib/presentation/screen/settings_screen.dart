@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smallstep/business_logic/theme/constants/theme_items.dart';
@@ -68,12 +66,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: Theme.of(context).textTheme.bodyMedium,
                           textAlign: TextAlign.start,
                         ),
-                        Spacer(),
+                        const Spacer(),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Icon(Icons.info_outline_rounded, size: 16),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Text(
                               'Changes applied after resetting timer.',
                               style: Theme.of(context).textTheme.bodySmall,

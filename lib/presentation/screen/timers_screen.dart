@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smallstep/business_logic/active_time/active_time_cubit.dart';
-import 'package:smallstep/data/repositories/active_time_repository.dart';
 import '../../business_logic/timer/timer_bloc.dart';
 
 class TimersScreen extends StatefulWidget {
@@ -14,7 +13,6 @@ class TimersScreen extends StatefulWidget {
 }
 
 class _TimersScreenState extends State<TimersScreen> {
-  late final int _remainingActiveTime = 30;
   Axis _timerAxis = Axis.vertical;
 
   @override
@@ -67,8 +65,6 @@ class ActiveMinutes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeMinutes =
-        context.select((ActiveTimeCubit bloc) => bloc.state.activeTime);
     return Center(
       child: Card(
           borderOnForeground: true,
@@ -92,9 +88,9 @@ class ActiveMinutes extends StatelessWidget {
                     height: 75.0,
                     color: Theme.of(context).hoverColor,
                     // decoration: BoxDecoration(color: Theme.of(context).dialogBackgroundColor),
-                    child: BlocBuilder<ActiveTimeCubit, ActiveTimeState>(
+                    child: BlocBuilder<ActiveTimeCubit, int>(
                       builder: (context, state) {
-                        return Text(state.activeTime.toString(),
+                        return Text(state.toString(),
                             style: Theme.of(context).textTheme.headlineSmall);
                       },
                     ),
@@ -104,6 +100,7 @@ class ActiveMinutes extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // TODO Replace with dedicated dialog box as callback for TimerComplete state
                     FloatingActionButton(
                       child: const Text("-30",
                       ),

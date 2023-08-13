@@ -30,6 +30,5 @@ class TimerTicked extends TimerEvent {
   final int duration;
   const TimerTicked(this.duration);
 
-  @override
   List<Object> get props => [duration];
 }
