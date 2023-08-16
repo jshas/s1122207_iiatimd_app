@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:smallstep/data/repositories/active_time_repository.dart';
 
 class ActiveTimeCubit extends Cubit<int> {
+  // ignore: unused_field
   StreamSubscription<int>? _activeTimeSubscription;
   static int _activeTime = 0;
   final ActiveTimePersistence _activeTimeRepository;

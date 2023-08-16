@@ -44,3 +44,4 @@ app.*.map.json
 /android/app/release
 /firestore.indexes.json
 /firestore.rules
+/lib/firebase_options.dart

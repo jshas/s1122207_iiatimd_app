@@ -41,10 +41,6 @@ class ActiveTimeRepository implements ActiveTimePersistence {
       _setActiveTimeValue(0);
       _controller.add(0);
     }
-    // FIXME Remove Print
-    print({
-      'activeTime': _getActiveTimeValue().toString(),
-    });
   }
 
   @override
@@ -59,9 +55,6 @@ class ActiveTimeRepository implements ActiveTimePersistence {
   @override
   Future<void> saveActiveTime(int time) {
     _controller.add(time);
-    print({
-      'storedTime': _getActiveTimeValue().toString(),
-    });
     print({'timer': time});
 
     return _setActiveTimeValue(time);
