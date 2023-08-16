@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smallstep/data/constants/activity_duration.dart';
 import 'package:smallstep/data/models/activity.dart';
 
 class ActivitiesScreen extends StatefulWidget {
@@ -21,13 +22,74 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     * Delete: Only for user-created files
     * */
     return ListView(
-      prototypeItem: const ActivityCard(name: 'Short Walk', activityImage: null, description: "Ok", activityDuration: ActivityDuration.short, ),
+      children: [
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            "Short duration (5 min)",
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        ActivityCard(
+          name: 'Short Walk',
+          activityImage: null,
+          description: "Ok",
+          activityDuration: ActivityDuration.short,
+        ),
+        ActivityCard(
+          name: 'Short Walk',
+          activityImage: null,
+          description: "Ok",
+          activityDuration: ActivityDuration.short,
+        ),
+        Divider(),
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            "Medium duration [10 min]",
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        ActivityCard(
+          name: 'Short Walk',
+          activityImage: null,
+          description: "Ok",
+          activityDuration: ActivityDuration.medium,
+        ),
+        ActivityCard(
+          name: 'Short Walk',
+          activityImage: null,
+          description: "Ok",
+          activityDuration: ActivityDuration.medium,
+        ),
+        Divider(),
+        // Long
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            "Long duration (15 min)",
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        ActivityCard(
+          name: 'Short Walk',
+          activityImage: null,
+          description: "Ok",
+          activityDuration: ActivityDuration.long,
+        ),
+        ActivityCard(
+          name: 'Short Walk',
+          activityImage: null,
+          description: "Ok",
+          activityDuration: ActivityDuration.medium,
+        ),
+        Divider(),
+      ],
     );
   }
 }
 
 class ActivityCard extends StatelessWidget {
-
   const ActivityCard(
       {super.key,
       required this.name,
@@ -43,28 +105,73 @@ class ActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget category;
-    switch(activityDuration){
+    String categoryText;
+    switch (activityDuration) {
       case ActivityDuration.short:
-        category = const Text("short");
+        categoryText = 'short';
+        category = Icon(Icons.access_time_sharp);
         break;
       case ActivityDuration.medium:
-        category = const Text("medium");
+        categoryText = 'medium';
+        category = Icon(Icons.access_time_filled_sharp);
         break;
       case ActivityDuration.long:
-        category = const Text("long");
+        categoryText = 'long';
+        category = const Icon(Icons.access_alarms_sharp);
         break;
     }
 
-    return ListTile(
-      title: Text(name),
-      leading: category,
-      isThreeLine: true,
-      titleTextStyle: Theme.of(context).listTileTheme.titleTextStyle,
-      subtitle: Text(description),
-      subtitleTextStyle: Theme.of(context).listTileTheme.subtitleTextStyle,
-      style: Theme.of(context).listTileTheme.style,
-      trailing: Placeholder(color: Theme.of(context).colorScheme.surface),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: ListTile(
+        style: Theme.of(context).listTileTheme.style,
+        title: Text(name),
+        titleTextStyle: Theme.of(context).listTileTheme.titleTextStyle,
+        subtitle: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(description),
+            Text(categoryText),
+          ],
+        ),
+        subtitleTextStyle: Theme.of(context).listTileTheme.subtitleTextStyle,
+        isThreeLine: true,
+        tileColor: Theme.of(context).hoverColor,
+        dense: false,
+        leading: Align(
+            alignment: AlignmentDirectional.center,
+            widthFactor: 1.0,
+            child: category),
+        trailing: Checkbox(value: false, onChanged: (bool? value) {
+          value != value;
+        },
+        ),
+      ),
     );
-
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: ListTile(
+        style: Theme.of(context).listTileTheme.style,
+        title: Text(name),
+        titleTextStyle: Theme.of(context).listTileTheme.titleTextStyle,
+        subtitle: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(description),
+            category,
+          ],
+        ),
+        subtitleTextStyle: Theme.of(context).listTileTheme.subtitleTextStyle,
+        isThreeLine: true,
+        tileColor: Theme.of(context).hoverColor,
+        dense: false,
+        leading: Align(
+            alignment: AlignmentDirectional.center,
+            widthFactor: 1.0,
+            child: category),
+      ),
+    );
   }
 }
