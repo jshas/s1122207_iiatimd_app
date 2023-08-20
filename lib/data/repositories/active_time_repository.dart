@@ -55,8 +55,6 @@ class ActiveTimeRepository implements ActiveTimePersistence {
   @override
   Future<void> saveActiveTime(int time) {
     _controller.add(time);
-    print({'timer': time});
-
     return _setActiveTimeValue(time);
   }
 

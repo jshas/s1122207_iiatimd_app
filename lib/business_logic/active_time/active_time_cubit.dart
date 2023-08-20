@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:smallstep/data/repositories/active_time_repository.dart';
 
 class ActiveTimeCubit extends Cubit<int> {
@@ -17,7 +18,13 @@ class ActiveTimeCubit extends Cubit<int> {
     getCurrentActiveTime();
   }
 
-
+  @override
+  void onChange(Change<int> change) {
+    super.onChange(change);
+    if (kDebugMode) {
+      print(change);
+    }
+  }
 
   void getCurrentActiveTime() {
     // Since `getTheme()` returns a stream, we listen to the output

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../data/repositories/theme_repository.dart';
 import 'constants/theme_items.dart';
@@ -15,8 +16,20 @@ class ThemeCubit extends Cubit<ThemeState> {
         super(const ThemeState(ThemeItem.dark, ThemeMode.dark));
 
   final ThemePersistence _themeRepository;
-  late StreamSubscription<ThemeItem> _themeSubscription; // This should be addressed for subsequent attempts to read out current data after init.
+  late StreamSubscription<ThemeItem>
+      _themeSubscription; // This should be addressed for subsequent attempts to read out current data after init.
 
+  void init() {
+    getCurrentTheme();
+  }
+
+  @override
+  void onChange(Change<ThemeState> change) {
+    super.onChange(change);
+    if (kDebugMode) {
+      print(change);
+    }
+  }
 
   void getCurrentTheme() {
     // Since `getTheme()` returns a stream, we listen to the output

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:smallstep/data/data_providers/ticker.dart';
 import 'package:smallstep/data/repositories/timer_repository.dart';
 
@@ -37,6 +38,14 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
   void init() {
     _timerItem = getTimerItem();
     updateDuration(_timerItem);
+  }
+
+  @override
+  void onChange(Change<TimerState> change) {
+    super.onChange(change);
+    if (kDebugMode) {
+      print(change);
+    }
   }
 
   void getCurrentTimerItem() {
