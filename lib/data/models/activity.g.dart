@@ -7,17 +7,19 @@ part of 'activity.dart';
 // **************************************************************************
 
 Activity _$ActivityFromJson(Map<String, dynamic> json) => Activity(
-      id: json['id'] as String,
-      title: json['title'] as String,
+      id: json['id'] as String?,
+      name: json['name'] as String,
       duration: $enumDecode(_$ActivityDurationEnumMap, json['duration']),
       description: json['description'] as String,
+      uid: json['uid'] as String,
     );
 
 Map<String, dynamic> _$ActivityToJson(Activity instance) => <String, dynamic>{
       'id': instance.id,
-      'title': instance.title,
+      'name': instance.name,
       'duration': _$ActivityDurationEnumMap[instance.duration]!,
       'description': instance.description,
+      'uid': instance.uid,
     };
 
 const _$ActivityDurationEnumMap = {

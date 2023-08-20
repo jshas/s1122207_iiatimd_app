@@ -16,6 +16,16 @@ class BaseScreen extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(title: Text(state.title, style: Theme.of(context).textTheme.headlineMedium), centerTitle: true),
+          floatingActionButton: (state.navbarItem == NavbarItem.activities) ? FloatingActionButton(
+            onPressed: () {
+              if (state.navbarItem == NavbarItem.activities) {
+
+              } else if (state.navbarItem == NavbarItem.timers) {
+                Navigator.pushNamed(context, '/add_timer');
+              }
+            },
+            child: const Icon(Icons.add),
+          ): null,
           bottomNavigationBar: BlocBuilder<NavigationCubit, NavigationState>(
             builder: (context, state) {
               return NavigationBar(
@@ -74,3 +84,4 @@ class BaseScreen extends StatelessWidget {
     );
   }
 }
+

@@ -1,7 +1,11 @@
+import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smallstep/data/constants/activity_duration.dart';
-import 'package:smallstep/data/models/activity.dart';
+import 'package:smallstep/data/repositories/activity_repository.dart';
+
+import '../../data/models/activity.dart';
 
 class ActivitiesScreen extends StatefulWidget {
   const ActivitiesScreen({super.key, required this.title});
@@ -13,6 +17,10 @@ class ActivitiesScreen extends StatefulWidget {
 }
 
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
+  List<Activity> shortActivities = [];
+  List<Activity> mediumActivities = [];
+  List<Activity> longActivities = [];
+
   @override
   Widget build(BuildContext context) {
     /*
@@ -21,151 +29,131 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     * Update: ActivityBloc => ActivityRepository => Firebase, Cloud Firestore
     * Delete: Only for user-created files
     * */
+    return FirestoreListView<Activity>(
+        query: context.read<ActivityRepository>().getActivityCollection(),
+        emptyBuilder: (context) => const Center(
+              child: Text('No activities found'),
+            ),
+        errorBuilder: (context, error, stackTrace) => Center(
+              child: Text(error.toString()),
+            ),
+        itemBuilder: (context, snapshot) {
+          final activity = snapshot.data();
+          if (kDebugMode) {
+            print(activity);
+          }
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ActivityCard(activity: activity),
+            ],
+          );
+        });
+  }
+}
+
+class ActivitiesList extends StatelessWidget {
+  const ActivitiesList({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return ListView(
       children: [
+        const Divider(),
         Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: Text(
             "Short duration (5 min)",
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme
+                .of(context)
+                .textTheme
+                .titleMedium,
           ),
         ),
-        ActivityCard(
-          name: 'Short Walk',
-          activityImage: null,
-          description: "Ok",
-          activityDuration: ActivityDuration.short,
-        ),
-        ActivityCard(
-          name: 'Short Walk',
-          activityImage: null,
-          description: "Ok",
-          activityDuration: ActivityDuration.short,
-        ),
-        Divider(),
+        const Divider(),
         Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: Text(
             "Medium duration [10 min]",
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme
+                .of(context)
+                .textTheme
+                .titleMedium,
           ),
         ),
-        ActivityCard(
-          name: 'Short Walk',
-          activityImage: null,
-          description: "Ok",
-          activityDuration: ActivityDuration.medium,
-        ),
-        ActivityCard(
-          name: 'Short Walk',
-          activityImage: null,
-          description: "Ok",
-          activityDuration: ActivityDuration.medium,
-        ),
-        Divider(),
+        const Divider(),
         // Long
         Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: Text(
             "Long duration (15 min)",
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme
+                .of(context)
+                .textTheme
+                .titleMedium,
           ),
         ),
-        ActivityCard(
-          name: 'Short Walk',
-          activityImage: null,
-          description: "Ok",
-          activityDuration: ActivityDuration.long,
-        ),
-        ActivityCard(
-          name: 'Short Walk',
-          activityImage: null,
-          description: "Ok",
-          activityDuration: ActivityDuration.medium,
-        ),
-        Divider(),
-      ],
-    );
+    ]);
   }
 }
 
 class ActivityCard extends StatelessWidget {
-  const ActivityCard(
-      {super.key,
-      required this.name,
-      required this.description,
-      required this.activityDuration,
-      required this.activityImage});
+  const ActivityCard({super.key,
+required this.activity});
 
-  final String name;
-  final String description;
-  final ActivityDuration activityDuration;
-  final Widget? activityImage;
+  final Activity activity;
 
   @override
   Widget build(BuildContext context) {
     Widget category;
     String categoryText;
-    switch (activityDuration) {
+    switch (activity.duration) {
       case ActivityDuration.short:
-        categoryText = 'short';
-        category = Icon(Icons.access_time_sharp);
+        categoryText = 'Short';
+        category = const Icon(Icons.five_mp);
         break;
       case ActivityDuration.medium:
-        categoryText = 'medium';
-        category = Icon(Icons.access_time_filled_sharp);
+        categoryText = 'Medium';
+        category = const Icon(Icons.ten_mp);
         break;
       case ActivityDuration.long:
-        categoryText = 'long';
-        category = const Icon(Icons.access_alarms_sharp);
+        categoryText = 'Long';
+        category = const Icon(Icons.fifteen_mp_sharp);
         break;
     }
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: ListTile(
-        style: Theme.of(context).listTileTheme.style,
-        title: Text(name),
-        titleTextStyle: Theme.of(context).listTileTheme.titleTextStyle,
+        style: Theme
+            .of(context)
+            .listTileTheme
+            .style,
+        title: Text(activity.name),
+        titleTextStyle: Theme
+            .of(context)
+            .listTileTheme
+            .titleTextStyle,
         subtitle: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(description),
+            Text(activity.description),
+            Text('id: ${activity.id}'),
+            Text('uid: ${activity.uid}'),
             Text(categoryText),
           ],
         ),
-        subtitleTextStyle: Theme.of(context).listTileTheme.subtitleTextStyle,
+        subtitleTextStyle: Theme
+            .of(context)
+            .listTileTheme
+            .subtitleTextStyle,
         isThreeLine: true,
-        tileColor: Theme.of(context).hoverColor,
-        dense: false,
-        leading: Align(
-            alignment: AlignmentDirectional.center,
-            widthFactor: 1.0,
-            child: category),
-        trailing: Checkbox(value: false, onChanged: (bool? value) {
-          value != value;
-        },
-        ),
-      ),
-    );
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: ListTile(
-        style: Theme.of(context).listTileTheme.style,
-        title: Text(name),
-        titleTextStyle: Theme.of(context).listTileTheme.titleTextStyle,
-        subtitle: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(description),
-            category,
-          ],
-        ),
-        subtitleTextStyle: Theme.of(context).listTileTheme.subtitleTextStyle,
-        isThreeLine: true,
-        tileColor: Theme.of(context).hoverColor,
+        tileColor: Theme
+            .of(context)
+            .hoverColor,
         dense: false,
         leading: Align(
             alignment: AlignmentDirectional.center,
