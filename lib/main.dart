@@ -9,12 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smallstep/business_logic/active_time/active_time_cubit.dart';
+import 'package:smallstep/business_logic/authentication/authentication_bloc.dart';
 import 'package:smallstep/business_logic/timer/timer_bloc.dart';
 import 'package:smallstep/data/repositories/active_time_repository.dart';
 import 'package:smallstep/data/repositories/activity_repository.dart';
+import 'package:smallstep/data/repositories/authentication_repository.dart';
 import 'package:smallstep/data/repositories/timer_repository.dart';
 import 'package:smallstep/presentation/screen/base_screen.dart';
 
+import 'business_logic/activity/activity_bloc.dart';
 import 'business_logic/navigation/navigation_cubit.dart';
 import 'business_logic/theme/theme_cubit.dart';
 import 'data/data_providers/ticker.dart';
@@ -23,7 +26,7 @@ import 'firebase_options.dart';
 import 'presentation/theme/color_schemes.dart';
 
 /// Used to connect to the firebase emulator
-const bool useEmulator = kDebugMode ? true : false;
+const bool useEmulator = false;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +35,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  if (useEmulator) {
+
+  if (useEmulator && kDebugMode) {
     await _connectToEmulator();
   }
   final themeRepository = ThemeRepository(sharedPreferences: sharedPreferences);
@@ -41,11 +45,15 @@ Future<void> main() async {
       ActiveTimeRepository(sharedPreferences: sharedPreferences);
   final activityRepository =
       FirebaseActivityRepository(firebaseFirestore: FirebaseFirestore.instance);
+  final authenticationRepository = AuthenticationRepositoryImpl(
+    firebaseAuth: FirebaseAuth.instance,
+  );
   runApp(App(
     themeRepository: themeRepository,
     timerRepository: timerRepository,
     activeTimeRepository: activeTimeRepository,
     activityRepository: activityRepository,
+    authenticationRepository: authenticationRepository,
   ));
 }
 
@@ -55,12 +63,14 @@ class App extends StatelessWidget {
       required this.timerRepository,
       required this.themeRepository,
       required this.activeTimeRepository,
-      required this.activityRepository});
+      required this.activityRepository,
+      required this.authenticationRepository});
 
   final TimerRepository timerRepository;
   final ThemeRepository themeRepository;
   final ActiveTimeRepository activeTimeRepository;
   final ActivityRepository activityRepository;
+  final AuthenticationRepositoryImpl authenticationRepository;
 
   // This widget is the root of your application.
   @override
@@ -77,6 +87,7 @@ class App extends StatelessWidget {
           create: (context) => activeTimeRepository,
         ),
         RepositoryProvider(create: (context) => activityRepository),
+        RepositoryProvider(create: (context) => authenticationRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -96,7 +107,15 @@ class App extends StatelessWidget {
           BlocProvider<ActiveTimeCubit>(
               create: (context) => ActiveTimeCubit(
                     activeTimeRepository: context.read<ActiveTimeRepository>(),
-                  )..getCurrentActiveTime())
+                  )..getCurrentActiveTime()),
+          BlocProvider<ActivityBloc>(
+              create: (context) => ActivityBloc(
+                    activityRepository: context.read<ActivityRepository>(),
+                  )),
+          BlocProvider<AuthenticationBloc>(
+              create: (context) => AuthenticationBloc(
+                  context.read<AuthenticationRepositoryImpl>()
+                    ..signInAnonymously())),
         ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, state) {
@@ -119,7 +138,6 @@ class App extends StatelessWidget {
     );
   }
 }
-
 
 // Settings for firebase emulator connection
 Future _connectToEmulator() async {

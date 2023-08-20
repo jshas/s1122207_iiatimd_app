@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/activity.dart';
 
 abstract class ActivityRepository {
   Future<void> addNewActivity(Activity activity);
 
   Query<Activity> getActivityCollection();
-
-   getDocumentById(String id);
 
   Future<void> deleteActivity(Activity activity);
 
@@ -20,6 +19,7 @@ abstract class ActivityRepository {
 
 class FirebaseActivityRepository implements ActivityRepository {
   final FirebaseFirestore _firebaseFirestore;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   FirebaseActivityRepository({required FirebaseFirestore? firebaseFirestore})
       : _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
@@ -31,21 +31,30 @@ class FirebaseActivityRepository implements ActivityRepository {
   @override
   Query<Activity> getActivityCollection() {
     final Query<Activity> activityQuery;
-    activityQuery = activitiesCollection.withConverter(
-      fromFirestore: (snapshot, _) => Activity.fromMap(snapshot),
-      toFirestore: (activity, _) => activity.toMap(),
-    );
+    activityQuery = activitiesCollection
+        .withConverter(
+          fromFirestore: (snapshot, _) => Activity.fromMap(snapshot),
+          toFirestore: (activity, _) => activity.toMap(),
+        )
+        .orderBy('duration', descending: true);
     return activityQuery;
   }
 
   /// Allows users to add custom activities to the database
   @override
   Future<void> addNewActivity(Activity activity) {
-    return activitiesCollection.add(activity.toMap());
+    if (_firebaseAuth.currentUser != null) {
+      Activity newActivity = activity.copyWith(
+          uid: _firebaseAuth.currentUser!.uid, protected: false);
+      return activitiesCollection.add(newActivity.toMap());
+    } else {
+      throw FirebaseAuthException(
+          code: 'ERROR_NOT_LOGGED_IN',
+          message: 'You must be logged in to add a custom activity.');
+    }
   }
 
   @override
-
 
   /// Allows users to retrieve all activities stored online, including custom activities
   @override
@@ -67,10 +76,5 @@ class FirebaseActivityRepository implements ActivityRepository {
   @override
   void dispose() {
     _controller.close();
-  }
-
-  @override
-  getDocumentById(String id) {
-    return activitiesCollection.doc(id).get();
   }
 }

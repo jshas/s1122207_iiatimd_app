@@ -18,8 +18,7 @@ class UserModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'email': email,
-      'displayName': displayName,
+      'uid': uid,
     };
   }
 
