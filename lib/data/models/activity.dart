@@ -12,11 +12,12 @@ part 'activity.g.dart';
 class Activity extends Equatable {
   /// {@macro activity_item}
   const Activity(
-      {required this.id,
+      {this.id,
       required this.name,
       required this.duration,
       required this.description,
-      required this.uid});
+      required this.uid,
+      this.protected});
 
   /// Unique identifier of the activity.
   final String? id;
@@ -33,6 +34,9 @@ class Activity extends Equatable {
   /// Unique identifier of the user who created the activity.
   final String uid;
 
+  /// Whether the activity is protected from deletion.
+  final bool? protected;
+
   /// Returns a copy of this 'Activity' with the given fields replaced with the new values.
   ///
   /// {@macro activity_item}
@@ -42,6 +46,7 @@ class Activity extends Equatable {
     ActivityDuration? duration,
     String? description,
     String? uid,
+    bool? protected,
   }) {
     return Activity(
       id: id ?? this.id,
@@ -49,6 +54,7 @@ class Activity extends Equatable {
       duration: duration ?? this.duration,
       description: description ?? this.description,
       uid: uid ?? this.uid,
+      protected: protected ?? false
     );
   }
 
@@ -72,6 +78,7 @@ class Activity extends Equatable {
       duration: data?['duration'] as ActivityDuration,
       description: data?['description'] as String,
       uid: data?['uid'] as String,
+      protected: data?['protected'] ?? false,
     );
   }
 
@@ -82,6 +89,7 @@ class Activity extends Equatable {
       'duration': duration.name,
       'description': description,
       'uid': uid,
+      'protected': protected,
     };
   }
 
@@ -92,5 +100,5 @@ class Activity extends Equatable {
   JsonMap toJson() => _$ActivityToJson(this);
 
   @override
-  List<Object?> get props => [id, name, duration, description, uid];
+  List<Object?> get props => [id, name, duration, description, uid, protected];
 }

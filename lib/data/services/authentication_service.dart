@@ -7,7 +7,7 @@ class AuthenticationService {
   Stream<UserModel> retrieveCurrentUser() {
     return auth.authStateChanges().map((User? user) {
       if (user != null) {
-        return UserModel(uid: user.uid, email: user.email);
+        return UserModel(uid: user.uid);
       } else {
         return  UserModel(uid: "uid");
       }
@@ -29,6 +29,16 @@ class AuthenticationService {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: user.email!, password: user.password!);
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      throw FirebaseAuthException(code: e.code, message: e.message);
+    }
+  }
+
+  Future<UserCredential> signInAnonymously() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInAnonymously();
+      print("Signed in with temporary account.");
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw FirebaseAuthException(code: e.code, message: e.message);

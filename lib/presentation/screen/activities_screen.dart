@@ -17,10 +17,6 @@ class ActivitiesScreen extends StatefulWidget {
 }
 
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
-  List<Activity> shortActivities = [];
-  List<Activity> mediumActivities = [];
-  List<Activity> longActivities = [];
-
   @override
   Widget build(BuildContext context) {
     /*
@@ -59,49 +55,38 @@ class ActivitiesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        const Divider(),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            "Short duration (5 min)",
-            style: Theme
-                .of(context)
-                .textTheme
-                .titleMedium,
-          ),
+    return ListView(children: [
+      const Divider(),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          "Short duration (5 min)",
+          style: Theme.of(context).textTheme.titleMedium,
         ),
-        const Divider(),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            "Medium duration [10 min]",
-            style: Theme
-                .of(context)
-                .textTheme
-                .titleMedium,
-          ),
+      ),
+      const Divider(),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          "Medium duration [10 min]",
+          style: Theme.of(context).textTheme.titleMedium,
         ),
-        const Divider(),
-        // Long
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            "Long duration (15 min)",
-            style: Theme
-                .of(context)
-                .textTheme
-                .titleMedium,
-          ),
+      ),
+      const Divider(),
+      // Long
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          "Long duration (15 min)",
+          style: Theme.of(context).textTheme.titleMedium,
         ),
+      ),
     ]);
   }
 }
 
 class ActivityCard extends StatelessWidget {
-  const ActivityCard({super.key,
-required this.activity});
+  const ActivityCard({super.key, required this.activity});
 
   final Activity activity;
 
@@ -112,53 +97,49 @@ required this.activity});
     switch (activity.duration) {
       case ActivityDuration.short:
         categoryText = 'Short';
-        category = const Icon(Icons.five_mp);
+        category = const Text('5-10 min');
         break;
       case ActivityDuration.medium:
         categoryText = 'Medium';
-        category = const Icon(Icons.ten_mp);
+        category = const Text('10-15 min');
         break;
       case ActivityDuration.long:
         categoryText = 'Long';
-        category = const Icon(Icons.fifteen_mp_sharp);
+        category = const Text('15-30 min');
         break;
     }
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: ListTile(
-        style: Theme
-            .of(context)
-            .listTileTheme
-            .style,
+        style: Theme.of(context).listTileTheme.style,
         title: Text(activity.name),
-        titleTextStyle: Theme
-            .of(context)
-            .listTileTheme
-            .titleTextStyle,
+        titleTextStyle: Theme.of(context).listTileTheme.titleTextStyle,
         subtitle: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(activity.description),
             Text('id: ${activity.id}'),
-            Text('uid: ${activity.uid}'),
+            Text('uid: ${activity.uid}', style: Theme.of(context).textTheme.labelSmall,),
+            Text('protected: ${activity.protected}'),
             Text(categoryText),
           ],
         ),
-        subtitleTextStyle: Theme
-            .of(context)
-            .listTileTheme
-            .subtitleTextStyle,
+        subtitleTextStyle: Theme.of(context).listTileTheme.subtitleTextStyle,
         isThreeLine: true,
-        tileColor: Theme
-            .of(context)
-            .hoverColor,
+        tileColor: Theme.of(context).hoverColor,
         dense: false,
         leading: Align(
             alignment: AlignmentDirectional.center,
             widthFactor: 1.0,
             child: category),
+        trailing: activity.protected == false ? IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () {
+            context.read<ActivityRepository>().deleteActivity(activity);
+          },
+        ): null,
       ),
     );
   }

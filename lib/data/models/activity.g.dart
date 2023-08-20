@@ -12,6 +12,7 @@ Activity _$ActivityFromJson(Map<String, dynamic> json) => Activity(
       duration: $enumDecode(_$ActivityDurationEnumMap, json['duration']),
       description: json['description'] as String,
       uid: json['uid'] as String,
+      protected: json['protected'] as bool,
     );
 
 Map<String, dynamic> _$ActivityToJson(Activity instance) => <String, dynamic>{
@@ -20,6 +21,7 @@ Map<String, dynamic> _$ActivityToJson(Activity instance) => <String, dynamic>{
       'duration': _$ActivityDurationEnumMap[instance.duration]!,
       'description': instance.description,
       'uid': instance.uid,
+      'protected': instance.protected,
     };
 
 const _$ActivityDurationEnumMap = {
