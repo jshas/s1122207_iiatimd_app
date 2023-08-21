@@ -54,16 +54,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: MediaQuery.of(context).orientation ==
                             Orientation.portrait
                         ? 400
-                        : 275,
+                        : 300,
                     height: 75,
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Reminder Duration',
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          style: Theme.of(context).textTheme.titleMedium,
                           textAlign: TextAlign.start,
                         ),
                         const Spacer(),
@@ -121,6 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           BlocBuilder<ThemeCubit, ThemeState>(
             builder: (context, state) => Flex(
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               direction:
@@ -133,12 +134,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width:
                       MediaQuery.of(context).orientation == Orientation.portrait
                           ? 400
-                          : 275,
+                          : 300,
                   height: 60,
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8.0),
                   child: Align(
-                    heightFactor: 0,
-                    widthFactor: 0,
                     alignment: AlignmentDirectional.centerStart,
                     child: Text(
                       "Theme",
@@ -147,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: SegmentedButton(
                     segments: const [
                       ButtonSegment<ThemeItem>(
