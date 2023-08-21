@@ -1,1 +1,1 @@
-enum NavbarItem { activities, timers, settings }
+enum BottomNavPage { activities, timers, settings,  }

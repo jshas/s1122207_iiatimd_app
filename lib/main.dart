@@ -27,6 +27,7 @@ import 'presentation/theme/color_schemes.dart';
 
 /// Used to connect to the firebase emulator
 const bool useEmulator = false;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +36,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   if (useEmulator && kDebugMode) {
     await _connectToEmulator();
@@ -44,7 +46,7 @@ Future<void> main() async {
   final activeTimeRepository =
       ActiveTimeRepository(sharedPreferences: sharedPreferences);
   final activityRepository =
-      FirebaseActivityRepository(firebaseFirestore: FirebaseFirestore.instance);
+      FirebaseActivityRepository(firebaseFirestore: firebaseFirestore);
   final authenticationRepository = AuthenticationRepositoryImpl(
     firebaseAuth: FirebaseAuth.instance,
   );
@@ -77,64 +79,67 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(
-          create: (context) => themeRepository,
-        ),
-        RepositoryProvider(
-          create: (context) => timerRepository,
-        ),
-        RepositoryProvider(
-          create: (context) => activeTimeRepository,
-        ),
+        RepositoryProvider(create: (context) => themeRepository),
+        RepositoryProvider(create: (context) => timerRepository),
+        RepositoryProvider(create: (context) => activeTimeRepository),
         RepositoryProvider(create: (context) => activityRepository),
         RepositoryProvider(create: (context) => authenticationRepository),
       ],
       child: MultiBlocProvider(
-        providers: [
-          BlocProvider<NavigationCubit>(
-            create: (context) => NavigationCubit(),
-          ),
-          BlocProvider<TimerBloc>(
-            create: (context) => TimerBloc(
-              ticker: const Ticker(),
-              timerRepository: context.read<TimerRepository>(),
-            )..getCurrentTimerItem(),
-          ),
-          BlocProvider<ThemeCubit>(
-              create: (context) => ThemeCubit(
-                    themeRepository: context.read<ThemeRepository>(),
-                  )..getCurrentTheme()),
-          BlocProvider<ActiveTimeCubit>(
-              create: (context) => ActiveTimeCubit(
-                    activeTimeRepository: context.read<ActiveTimeRepository>(),
-                  )..getCurrentActiveTime()),
-          BlocProvider<ActivityBloc>(
-              create: (context) => ActivityBloc(
-                    activityRepository: context.read<ActivityRepository>(),
-                  )),
-          BlocProvider<AuthenticationBloc>(
-              create: (context) => AuthenticationBloc(
-                  context.read<AuthenticationRepositoryImpl>()
-                    ..signInAnonymously())),
-        ],
-        child: BlocBuilder<ThemeCubit, ThemeState>(
-          builder: (context, state) {
+          providers: [
+            BlocProvider<NavigationCubit>(
+              create: (context) => NavigationCubit(),
+            ),
+            BlocProvider<TimerBloc>(
+              create: (context) => TimerBloc(
+                ticker: const Ticker(),
+                timerRepository: context.read<TimerRepository>(),
+              )..getCurrentTimerItem(),
+            ),
+            BlocProvider<ThemeCubit>(
+                create: (context) => ThemeCubit(
+                      themeRepository: context.read<ThemeRepository>(),
+                    )..getCurrentTheme()),
+            BlocProvider<ActiveTimeCubit>(
+                create: (context) => ActiveTimeCubit(
+                      activeTimeRepository:
+                          context.read<ActiveTimeRepository>(),
+                    )..getCurrentActiveTime()),
+            BlocProvider<ActivityBloc>(
+                create: (context) => ActivityBloc(
+                      activityRepository: context.read<ActivityRepository>(),
+                    )),
+            BlocProvider<AuthenticationBloc>(
+                create: (context) => AuthenticationBloc(
+                    context.read<AuthenticationRepositoryImpl>())
+                  ..add(AuthenticationStarted())),
+          ],
+          child: BlocBuilder<ThemeCubit, ThemeState>(builder: (context, state) {
             return MaterialApp(
-              title: 'Flutter Demo',
-              themeMode: state.themeMode,
-              theme: ThemeData(
-                  colorScheme: lightColorScheme,
-                  useMaterial3: true,
-                  visualDensity: VisualDensity.adaptivePlatformDensity),
-              darkTheme: ThemeData(
-                  colorScheme: darkColorScheme,
-                  useMaterial3: true,
-                  visualDensity: VisualDensity.adaptivePlatformDensity),
-              home: const BaseScreen(),
-            );
-          },
-        ),
-      ),
+                title: 'Flutter Demo',
+                themeMode: state.themeMode,
+                theme: ThemeData(
+                    colorScheme: lightColorScheme,
+                    useMaterial3: true,
+                    visualDensity: VisualDensity.adaptivePlatformDensity),
+                darkTheme: ThemeData(
+                    colorScheme: darkColorScheme,
+                    useMaterial3: true,
+                    visualDensity: VisualDensity.adaptivePlatformDensity),
+                home: const BaseScreen(),
+                debugShowCheckedModeBanner: false,
+                navigatorKey: navigatorKey,
+                onGenerateRoute: (settings) {
+                  switch (settings.name) {
+                    case '/':
+                      return MaterialPageRoute(
+                          builder: (context) => const BaseScreen());
+                    default:
+                      return MaterialPageRoute(
+                          builder: (context) => const BaseScreen());
+                  }
+                });
+          })),
     );
   }
 }
@@ -144,7 +149,6 @@ Future _connectToEmulator() async {
   final host = Platform.isAndroid ? '10.0.2.2' : 'localhost';
   const authPort = 9099;
   const firestorePort = 8080;
-  // const storagePort = 9199;
 
   if (kDebugMode) {
     print("I am running on emulator");
@@ -153,5 +157,4 @@ Future _connectToEmulator() async {
   // Assign emulator settings to Firebase instances
   await FirebaseAuth.instance.useAuthEmulator(host, authPort);
   FirebaseFirestore.instance.useFirestoreEmulator(host, firestorePort);
-  // FirebaseStorage.instance.useStorageEmulator(host, storagePort);
 }

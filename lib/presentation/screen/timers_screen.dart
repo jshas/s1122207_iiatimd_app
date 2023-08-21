@@ -73,7 +73,7 @@ class ActiveMinutes extends StatelessWidget {
           elevation: 0,
           child: Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
@@ -96,31 +96,33 @@ class ActiveMinutes extends StatelessWidget {
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // TODO Replace with dedicated dialog box as callback for TimerComplete state
-                    FloatingActionButton(
-                      child: const Text("-30",
-                      ),
-                      onPressed: () =>
-                          context.read<ActiveTimeCubit>().updateActiveTime(-30),
-                    ),      FloatingActionButton(
-                      child: Text(
-                        '+30', style: Theme.of(context).textTheme.labelLarge,
-                      ),
-                      onPressed: () =>
-                          context.read<ActiveTimeCubit>().updateActiveTime(30),
-                    ),     FloatingActionButton(
-                      child: Text(
-                      '+0', style: Theme.of(context).textTheme.labelLarge,
-                      ),
-                      onPressed: () =>
-                          context.read<ActiveTimeCubit>().updateActiveTime(0),
-                    ),
-                  ],
-                )
+                const Text(
+                  "All the active minutes you've earned!"
+                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   crossAxisAlignment: CrossAxisAlignment.center,
+                //   children: [
+                //     FloatingActionButton(
+                //       child: const Text("-30",
+                //       ),
+                //       onPressed: () =>
+                //           context.read<ActiveTimeCubit>().updateActiveTime(-30),
+                //     ),      FloatingActionButton(
+                //       child: Text(
+                //         '+30', style: Theme.of(context).textTheme.labelLarge,
+                //       ),
+                //       onPressed: () =>
+                //           context.read<ActiveTimeCubit>().updateActiveTime(30),
+                //     ),     FloatingActionButton(
+                //       child: Text(
+                //       '+0', style: Theme.of(context).textTheme.labelLarge,
+                //       ),
+                //       onPressed: () =>
+                //           context.read<ActiveTimeCubit>().updateActiveTime(0),
+                //     ),
+                //   ],
+                // )
               ],
             ),
           )),

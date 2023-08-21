@@ -38,4 +38,9 @@ class FirebaseUserRepository implements UserRepository {
     return Future.value(credentials != null);
   }
 
+  Future<User> updatedUserCollection(){
+    final currentUser = _firebaseAuth.currentUser;
+    return Future.value(currentUser!);
+  }
+
 }
