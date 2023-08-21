@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:smallstep/data/models/activity.dart';
@@ -17,6 +18,7 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
       : _activityRepository = activityRepository,
         super(const ActivityInitial()) {
     on<ActivityAllRequested>(_activityAllRequested);
+    on<ActivityQueryRequested>(_activityQueryRequest);
     on<ActivityAdded>(_addActivity);
     on<ActivityUpdated>(_updateActivity);
     on<ActivityDeleted>(_deleteActivity);
@@ -30,6 +32,8 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
     }
   }
 
+
+
   Future<void> _activityAllRequested(
       ActivityAllRequested event, Emitter<ActivityState> emit) async {
     List<Activity> listOfActivities = await _activityRepository
@@ -41,7 +45,12 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
 
   Future<void> _addActivity(
       ActivityAdded event, Emitter<ActivityState> emit) async {
-    _activityRepository.addNewActivity(event.activity);
+
+    try {
+      _activityRepository.addNewActivity(event.activity);
+    } catch (e) {
+      emit(ActivityFailure(e.toString()));
+    }
     return emit(ActivityChanged(event.activity));
   }
 
@@ -61,5 +70,10 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
   Future<void> close() {
     _activityRepository.dispose();
     return super.close();
+  }
+
+  Future<void> _activityQueryRequest(ActivityQueryRequested event, Emitter<ActivityState> emit) async {
+    Query<Activity> listOfActivities = _activityRepository.getActivityCollection();
+    emit(ActivitySuccessQuery(listOfActivities));
   }
 }

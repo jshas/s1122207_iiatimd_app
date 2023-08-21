@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../models/activity.dart';
 
 abstract class ActivityRepository {
@@ -18,6 +20,7 @@ abstract class ActivityRepository {
 }
 
 class FirebaseActivityRepository implements ActivityRepository {
+  // ignore: unused_field
   final FirebaseFirestore _firebaseFirestore;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -31,13 +34,14 @@ class FirebaseActivityRepository implements ActivityRepository {
   @override
   Query<Activity> getActivityCollection() {
     final Query<Activity> activityQuery;
-    activityQuery = activitiesCollection
-        .withConverter(
-          fromFirestore: (snapshot, _) => Activity.fromMap(snapshot),
-          toFirestore: (activity, _) => activity.toMap(),
-        )
-        .orderBy('duration', descending: true);
-    return activityQuery;
+      activityQuery = activitiesCollection
+      .where('uid', whereIn: [_firebaseAuth.currentUser?.uid.toString() ?? '0', '-'])
+          .withConverter(
+            fromFirestore: (snapshot, _) => Activity.fromMap(snapshot),
+            toFirestore: (activity, _) => activity.toJson(),
+          )
+          .orderBy('duration', descending: true);
+      return activityQuery;
   }
 
   /// Allows users to add custom activities to the database

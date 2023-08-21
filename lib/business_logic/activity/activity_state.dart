@@ -31,10 +31,28 @@ class ActivityChanged extends ActivityState {
   List<Object?> get props => [activity];
 }
 
+class ActivitySuccessQuery extends ActivityState {
+  final Query<Activity> query;
+
+  const ActivitySuccessQuery(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
 class ActivitySuccess extends ActivityState {
 final List<Activity> listOfActivities;
   const ActivitySuccess(this.listOfActivities);
 
   @override
   List<Object?> get props => [listOfActivities];
+}
+
+class ActivityFailure extends ActivityState {
+  final String error;
+
+  const ActivityFailure(this.error);
+
+  @override
+  List<Object?> get props => [error];
 }

@@ -8,6 +8,12 @@ abstract class ActivityEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class ActivityQueryRequested extends ActivityEvent {
+  const ActivityQueryRequested();
+  @override
+  List<Object?> get props => [];
+}
+
 class ActivityAllRequested extends ActivityEvent {
   const ActivityAllRequested();
 
