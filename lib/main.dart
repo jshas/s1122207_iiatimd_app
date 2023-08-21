@@ -27,9 +27,8 @@ import 'presentation/theme/color_schemes.dart';
 
 /// Used to connect to the firebase emulator
 const bool useEmulator = false;
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
@@ -158,3 +157,5 @@ Future _connectToEmulator() async {
   await FirebaseAuth.instance.useAuthEmulator(host, authPort);
   FirebaseFirestore.instance.useFirestoreEmulator(host, firestorePort);
 }
+
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

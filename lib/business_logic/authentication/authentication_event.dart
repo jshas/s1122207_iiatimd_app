@@ -12,7 +12,15 @@ class AuthenticationStarted extends AuthenticationEvent {
   List<Object> get props => [];
 }
 
-class AuthenticationSignedOut extends AuthenticationEvent {
+class AuthenticationLoginRequested extends AuthenticationEvent {
+  final String uid;
+  const AuthenticationLoginRequested({required this.uid});
+
+  @override
+  List<Object> get props => [uid];
+}
+
+class AuthenticationLogoutRequested extends AuthenticationEvent {
   @override
   List<Object> get props => [];
 }

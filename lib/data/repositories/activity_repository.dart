@@ -40,7 +40,8 @@ class FirebaseActivityRepository implements ActivityRepository {
             fromFirestore: (snapshot, _) => Activity.fromMap(snapshot),
             toFirestore: (activity, _) => activity.toJson(),
           )
-          .orderBy('duration', descending: true);
+          .orderBy('duration', descending: true)
+    .orderBy('protected', descending: false);
       return activityQuery;
   }
 

@@ -35,4 +35,7 @@ final class TimerRunInProgress extends TimerState {
 
 final class TimerRunComplete extends TimerState {
   const TimerRunComplete() : super(0);
+
+  @override
+  String toString() => 'TimerRunComplete';
 }

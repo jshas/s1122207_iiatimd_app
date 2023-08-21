@@ -1,8 +1,8 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:smallstep/data/models/user.dart';
 
 import '../../data/repositories/authentication_repository.dart';
 
@@ -12,57 +12,53 @@ part 'authentication_state.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-  final AuthenticationRepository _authenticationRepository;
+  final AuthenticationRepositoryImpl _authenticationRepository;
 
   AuthenticationBloc(this._authenticationRepository)
-      : super(AuthenticationInitial()) {
-    on<AuthenticationEvent>((event, emit) async {
-      if (event is AuthenticationStarted) {
-        UserModel user = await _authenticationRepository
-            .getCurrentUser()
-            .first;
-        if (user.uid != null) {
-          emit(AuthenticationSuccess(uid: user.uid));
-        } else {
-          await _authenticationRepository.signInAnonymously();
-          UserModel user =
-          await _authenticationRepository
-              .getCurrentUser()
-              .first;
-          if (user.uid != null) {
-            emit(AuthenticationSuccess(uid: user.uid));
-          } else {
-            emit(AuthenticationFailure());
-          }
-        }
-      } else if (event is AuthenticationSignedOut) {
-        await _authenticationRepository.signOut();
-        emit(AuthenticationFailure());
-      }
+      : super(const AuthenticationInitial()) {
+    on<AuthenticationStarted>(_onAuthStarted);
+    on<AuthenticationLoginRequested>(_onLoginRequested);
+    on<AuthenticationLogoutRequested>(_onLogoutRequested);
+  }
 
-      Future<UserCredential?> signInAnonymously() async {
-        try {
-          print("Signed in with temporary account.");
-          return await _authenticationRepository.signInAnonymously();
-        } on FirebaseAuthException catch (e) {
-          switch (e.code) {
-            case "operation-not-allowed":
-              print("Anonymous auth hasn't been enabled for this project.");
-              break;
-            default:
-              print("Unknown error.");
-          }
-        }
-        return null;
-      }
 
-      @override
-      void onChange(Change<AuthenticationState> change) {
-        if (kDebugMode) {
-          print(change);
-        }
-        super.onChange(change);
+  Future<void> _onAuthStarted(AuthenticationStarted event, Emitter<AuthenticationState> emit) async {
+    UserCredential? user;
+    user = await _authenticationRepository.signInAnonymously();
+    if (user != null) {
+      emit(AuthenticationSuccess(user.user!.uid));
+    } else {
+      emit(const AuthenticationFailure("User not found."));
+    }
+  }
+
+  Future<void> _onLoginRequested(AuthenticationLoginRequested event, Emitter<AuthenticationState> emit) async {
+    if(_authenticationRepository.firebaseAuth.currentUser != null) {
+      emit(AuthenticationSuccess(_authenticationRepository.firebaseAuth.currentUser!.uid));
+    }
+    _authenticationRepository.signInAnonymously().then((UserCredential? user) {
+      if (user != null) {
+        emit(AuthenticationSuccess(user.user!.uid));
+      } else {
+        emit(const AuthenticationFailure("User not found."));
       }
     });
   }
+
+  Future<void> _onLogoutRequested(AuthenticationLogoutRequested event, Emitter<AuthenticationState> emit) async {
+    await _authenticationRepository.signOut();
+  }
+
+  Future<FutureOr<void>> signInAnonymously(AuthenticationLogoutRequested event, Emitter<AuthenticationState> emit) async {
+    try {
+      await _authenticationRepository.signInAnonymously();
+      emit (AuthenticationSuccess(_authenticationRepository.getCurrentUser().toString()));
+    } on FirebaseAuthException catch (e) {
+      emit(AuthenticationFailure(e.message.toString()));
+      throw FirebaseAuthException(code: e.code, message: e.message);
+    }
+  }
+
+
 }
+

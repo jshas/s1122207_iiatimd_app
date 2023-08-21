@@ -24,7 +24,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-              'A space for all activities selectable after completing a work timer. Your custom activities are indicated with a darker color. Try it out with the button below!',
+              'A space for all activities selectable after completing a work timer. You can make your own with the button below.',
               style: Theme.of(context).textTheme.labelSmall),
         ),
         Divider(
@@ -44,7 +44,10 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
             ),
             itemBuilder: (context, snapshot) {
               final activity = snapshot.data();
-              return Column(mainAxisSize: MainAxisSize.min, children: [
+              return Column(mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                 ActivityCard(activity: activity),
               ]);
             },
@@ -52,43 +55,6 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         ),
       ],
     );
-  }
-}
-
-class ActivitiesList extends StatelessWidget {
-  const ActivitiesList({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(children: [
-      const Divider(),
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          "Short duration (5 min)",
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
-      const Divider(),
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          "Medium duration [10 min]",
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
-      const Divider(),
-      // Long
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          "Long duration (15 min)",
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
-    ]);
   }
 }
 
@@ -105,20 +71,44 @@ class ActivityCard extends StatelessWidget {
     switch (activity.duration) {
       case ActivityDuration.short:
         categoryText = 'Short';
-        category = const Text('5-10 min');
+        category = const Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Duration', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),),
+            Text('Short'),
+            Text( "5-10 min"),
+          ],
+        );
         break;
       case ActivityDuration.medium:
         categoryText = 'Medium';
-        category = const Text('10-15 min');
+        category = const Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Duration', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),),
+            Text('Medium'),
+            Text( "10-15 min"),
+          ],
+        );
         break;
       case ActivityDuration.long:
         categoryText = 'Long';
-        category = const Text('15-30 min');
+        category = const Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Duration', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
+            Text('Long'),
+            Text( ">20 min"),
+          ],
+        );
         break;
     }
 
     return Padding(
-      padding: const EdgeInsets.all(4.0),
+      padding: const EdgeInsets.all(12.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: ListTile(
@@ -129,12 +119,8 @@ class ActivityCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(activity.duration.name),
               Text(activity.description),
-              Text('id: ${activity.id}'),
-              Text(
-                'uid: ${activity.uid}',
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
               Text(categoryText),
             ],
           ),
@@ -145,19 +131,54 @@ class ActivityCard extends StatelessWidget {
               : Theme.of(context).colorScheme.surfaceVariant,
           dense: false,
           leading: Align(
-              alignment: AlignmentDirectional.center,
+              alignment: AlignmentDirectional.centerStart,
               widthFactor: 1.0,
               child: category),
           trailing: activity.protected == false
               ? IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    context.read<ActivityRepository>().deleteActivity(activity);
+                        onRemoveActivityPressed(context,activity);
                   },
                 )
-              : null,
+              : const Row(
+                  mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.lock),
+                  Text('App activity') ],
+              ),
         ),
       ),
     );
+  }
+
+  void onRemoveActivityPressed(BuildContext context, Activity activity) {
+    showDialog(context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Remove activity'),
+
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:  [
+              Text("Are you sure you want to remove this activity?"),
+              Text('(This action cannot be undone!)', style: TextStyle(fontSize: 12, color: Colors.red),),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<ActivityRepository>().deleteActivity(activity);
+              },
+              child: const Text('Remove')),
+          ],
+        ));
   }
 }

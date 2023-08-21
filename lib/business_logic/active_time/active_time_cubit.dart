@@ -37,7 +37,7 @@ class ActiveTimeCubit extends Cubit<int> {
 
   void updateActiveTime(int timeValue) {
     int activeTime = _activeTime + timeValue;
-    _activeTime = activeTime;
+    activeTime > 0 ? _activeTime = activeTime : _activeTime = 0;
     _activeTimeRepository.saveActiveTime(_activeTime);
   }
 }

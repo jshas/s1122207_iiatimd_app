@@ -36,7 +36,4 @@ class TimerRepository implements TimerPersistence {
   @override
   void dispose() => _controller.close();
 
-  void init() {
-
-  }
 }

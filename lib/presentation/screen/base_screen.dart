@@ -1,55 +1,40 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:smallstep/business_logic/activity/activity_bloc.dart';
-import 'package:smallstep/business_logic/authentication/authentication_bloc.dart';
-import 'package:smallstep/data/constants/activity_duration.dart';
-import 'package:smallstep/data/models/activity.dart';
 import 'package:smallstep/presentation/screen/activities_screen.dart';
 import 'package:smallstep/presentation/screen/settings_screen.dart';
 import 'package:smallstep/presentation/screen/timers_screen.dart';
 
-import '../../data/repositories/authentication_repository.dart';
 import '/business_logic/navigation/constants/nav_bar_items.dart';
 import '/business_logic/navigation/navigation_cubit.dart';
+import '../components/add_activity_dialog.dart';
+
+GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
+GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
 class BaseScreen extends StatelessWidget {
   const BaseScreen({super.key});
-
-  signInAnonymously(context) async {
-    await context.read<AuthenticationRepository>().signInAnonymously();
-    print(FirebaseAuth.instance.currentUser!.uid);
-  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NavigationCubit, NavigationState>(
       builder: (context, state) {
         return Scaffold(
+          key: GlobalKey().currentState?.widget.key,
           appBar: AppBar(
-              title: Text(state.title,
-                  style: Theme.of(context).textTheme.headlineMedium),
-              centerTitle: true),
-          floatingActionButton: (state.navbarItem == NavbarItem.activities)
+            title: Text(state.title,
+                style: Theme.of(context).textTheme.headlineSmall),
+            centerTitle: true,
+          ),
+          floatingActionButton: (state.navbarItem == BottomNavPage.activities)
               ? FloatingActionButton(
+                  mini: true,
                   onPressed: () {
-                    return context.read<ActivityBloc>().add(const ActivityAdded(
-                            activity: Activity(
-                          name: 'New Activity',
-                          description: 'New Activity Description',
-                          duration: ActivityDuration.long,
-                          uid: '2',
-                          protected: false,
-                        )));
+                    onAddActivityPressed(context);
                   },
                   child: const Icon(Icons.add),
                 )
-              : FloatingActionButton(
-                  onPressed: () {
-                    context.read<AuthenticationBloc>().add(AuthenticationStarted());
-                  },
-                  child: const Icon(Icons.login),
-                ),
+              : null,
           bottomNavigationBar: BlocBuilder<NavigationCubit, NavigationState>(
             builder: (context, state) {
               return NavigationBar(
@@ -77,13 +62,13 @@ class BaseScreen extends StatelessWidget {
                 onDestinationSelected: (index) {
                   if (index == 0) {
                     BlocProvider.of<NavigationCubit>(context)
-                        .getNavBarItem(NavbarItem.activities);
+                        .getNavBarItem(BottomNavPage.activities);
                   } else if (index == 1) {
                     BlocProvider.of<NavigationCubit>(context)
-                        .getNavBarItem(NavbarItem.timers);
+                        .getNavBarItem(BottomNavPage.timers);
                   } else if (index == 2) {
                     BlocProvider.of<NavigationCubit>(context)
-                        .getNavBarItem(NavbarItem.settings);
+                        .getNavBarItem(BottomNavPage.settings);
                   }
                 },
               );
@@ -91,20 +76,28 @@ class BaseScreen extends StatelessWidget {
           ),
           body: BlocBuilder<NavigationCubit, NavigationState>(
               builder: (context, state) {
-            if (state.navbarItem == NavbarItem.activities) {
+            if (state.navbarItem == BottomNavPage.activities) {
               return const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: ActivitiesScreen(title: "Activities"),
               );
-            } else if (state.navbarItem == NavbarItem.timers) {
+            } else if (state.navbarItem == BottomNavPage.timers) {
               return const TimersScreen(title: "Timers");
-            } else if (state.navbarItem == NavbarItem.settings) {
+            } else if (state.navbarItem == BottomNavPage.settings) {
               return const SettingsScreen(title: "Settings");
             }
-            return Container();
+            return const Center(child: Text('Error'));
           }),
         );
       },
     );
+  }
+
+  void onAddActivityPressed(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const AddActivityDialog();
+        });
   }
 }

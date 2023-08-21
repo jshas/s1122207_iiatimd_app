@@ -54,13 +54,13 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
     return emit(ActivityChanged(event.activity));
   }
 
-  FutureOr<void> _updateActivity(
+  Future<void> _updateActivity(
       ActivityUpdated event, Emitter<ActivityState> emit) async {
     _activityRepository.updateActivity(event.activity);
     return emit(ActivityChanged(event.activity));
   }
 
-  FutureOr<void> _deleteActivity(
+  Future<void> _deleteActivity(
       ActivityDeleted event, Emitter<ActivityState> emit) async {
     _activityRepository.deleteActivity(event.activity);
     return emit(ActivityChanged(event.activity));

@@ -76,7 +76,12 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     int minute = 60;
     switch (timerItem) {
       case TimerItem.short:
-        _duration = 15 * minute;
+        if(kDebugMode) {
+          _duration = 5; // Only for in debug-release. In production, it is 15 * minute;
+        }
+        else {
+          _duration = 15 * minute;
+        }
         break;
       case TimerItem.medium:
         _duration = 30 * minute;
@@ -135,7 +140,6 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
         ? TimerRunInProgress(event.duration)
 
         /// triggers the TimerRunInProgress state
-        /// TODO: Use complete state to update UI so user can input new value.
         : const TimerRunComplete());
     /// triggers TimerRunComplete state
   }
